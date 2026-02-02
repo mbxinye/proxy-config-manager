@@ -951,5 +951,150 @@
         "avg_latency": 999
       }
     ]
+  },
+  {
+    "timestamp": "2026-02-02T17:06:05.306183",
+    "subscriptions": [
+      {
+        "name": "sub_001",
+        "score": 25,
+        "frequency": "suspended",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_002",
+        "score": 25,
+        "frequency": "suspended",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_003",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_004",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_005",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_006",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_008",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_009",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_008",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_011",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_012",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_013",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_014",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_015",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_016",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_017",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_018",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_019",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_020",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_021",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      }
+    ]
   }
 ]
