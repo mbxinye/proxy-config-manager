@@ -17,3 +17,11 @@ https://raw.githubusercontent.com/snakem982/proxypool/main/source/clash-meta.yam
 https://raw.githubusercontent.com/snakem982/proxypool/main/source/clash-meta-2.yaml
 https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list.meta.yml
 https://raw.githubusercontent.com/shaoyouvip/free/refs/heads/main/all.yaml
+https://gh-proxy.com/raw.githubusercontent.com/Barabama/FreeNodes/main/nodes/yudou66.yaml
+https://gh-proxy.com/raw.githubusercontent.com/Barabama/FreeNodes/main/nodes/blues.yaml
+https://gh-proxy.com/raw.githubusercontent.com/Barabama/FreeNodes/main/nodes/clashmeta.yaml
+https://gh-proxy.com/raw.githubusercontent.com/Barabama/FreeNodes/main/nodes/ndnode.yaml
+https://gh-proxy.com/raw.githubusercontent.com/Barabama/FreeNodes/main/nodes/nodev2ray.yaml
+https://gh-proxy.com/raw.githubusercontent.com/Barabama/FreeNodes/main/nodes/nodefree.yaml
+https://gh-proxy.com/raw.githubusercontent.com/Barabama/FreeNodes/main/nodes/v2rayshare.yaml
+https://gh-proxy.com/raw.githubusercontent.com/Barabama/FreeNodes/main/nodes/wenode.yaml

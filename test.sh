@@ -73,6 +73,11 @@ echo ""
 echo "[*] 生成测试报告..."
 python3 scripts/subscription_manager.py report | tee output/test_report.md
 
+# 生成 Clash.meta 配置
+echo ""
+echo "[*] 生成 Clash.meta 配置文件..."
+python3 scripts/clashmeta_generator.py
+
 echo ""
 echo "========================================"
 echo "严格模式测试完成!"

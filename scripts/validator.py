@@ -16,6 +16,11 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 import urllib.request
 
+try:
+    import aiohttp
+except ImportError:
+    aiohttp = None
+
 from config import Config
 
 
@@ -359,7 +364,6 @@ class NodeValidator:
     async def test_tcp_connect(self, host: str, port: int) -> Tuple[bool, float, str]:
         """严格的TCP连接测试"""
         try:
-            # 首先进行DNS解析
             try:
                 addr_info = await asyncio.wait_for(
                     asyncio.get_event_loop().getaddrinfo(host, None),
@@ -370,18 +374,15 @@ class NodeValidator:
             except Exception:
                 return False, float("inf"), "DNS解析失败"
 
-            # 进行TCP连接测试
             start_time = time.time()
             reader, writer = await asyncio.wait_for(
                 asyncio.open_connection(host, port), timeout=self.timeout
             )
             latency = (time.time() - start_time) * 1000
 
-            # 立即关闭连接
             writer.close()
             await writer.wait_closed()
 
-            # 检查延迟是否在合理范围内
             if latency < self.max_latency:
                 return True, latency, "TCP连接成功"
             else:
@@ -398,17 +399,80 @@ class NodeValidator:
         except Exception as e:
             return False, float("inf"), f"错误: {str(e)[:30]}"
 
-    async def validate_node(self, node: Dict) -> Tuple[bool, float, str]:
-        """严格验证节点"""
+    async def test_http_proxy(self, node: Dict) -> Tuple[bool, float, str]:
+        """HTTP代理真实可用性测试 - 真正通过代理发起HTTP请求"""
         server = node.get("server", "")
         port = node.get("port", 0)
 
         if not server or not port:
             return False, float("inf"), "无效的服务器或端口"
 
-        # 严格模式：必须通过TCP连接测试
-        success, latency, reason = await self.test_tcp_connect(server, port)
-        return success, latency, reason
+        if not aiohttp:
+            return False, float("inf"), "aiohttp未安装，跳过HTTP测试"
+
+        test_urls = [
+            "https://www.google.com/generate_204",
+            "https://www.gstatic.com/generate_204",
+        ]
+
+        proxy = f"socks5://{server}:{port}"
+
+        timeout_obj = aiohttp.ClientTimeout(total=self.timeout)
+
+        try:
+            connector = aiohttp.TCPConnector(keepalive_timeout=30)
+            async with aiohttp.ClientSession(
+                connector=connector, timeout=timeout_obj
+            ) as session:
+                for test_url in test_urls:
+                    try:
+                        headers = {
+                            "Proxy-Authorization": f"Basic {base64.b64encode(f'{server}:{port}'.encode()).decode()}"
+                        }
+                        start_time = time.time()
+                        async with session.get(
+                            test_url, proxy=proxy, ssl=False, timeout=timeout_obj
+                        ) as response:
+                            latency = (time.time() - start_time) * 1000
+
+                            if response.status in [200, 204]:
+                                if latency < self.max_latency:
+                                    return (
+                                        True,
+                                        latency,
+                                        f"HTTP代理可用({response.status})",
+                                    )
+                                else:
+                                    return (
+                                        False,
+                                        latency,
+                                        f"延迟过高({latency:.0f}ms)",
+                                    )
+                    except (aiohttp.ClientError, asyncio.TimeoutError):
+                        continue
+
+                return False, float("inf"), "HTTP代理无响应"
+
+        except asyncio.TimeoutError:
+            return False, float("inf"), "HTTP请求超时"
+        except Exception as e:
+            return False, float("inf"), f"错误: {str(e)[:40]}"
+
+    async def validate_node(self, node: Dict) -> Tuple[bool, float, str]:
+        """严格验证节点 - HTTP代理真实可用性测试"""
+        server = node.get("server", "")
+        port = node.get("port", 0)
+        node_type = node.get("type", "")
+
+        if not server or not port:
+            return False, float("inf"), "无效的服务器或端口"
+
+        if node_type in ["ss", "ssr", "vmess", "trojan", "vless"]:
+            success, latency, reason = await self.test_http_proxy(node)
+            return success, latency, reason
+        else:
+            success, latency, reason = await self.test_tcp_connect(server, port)
+            return success, latency, reason
 
     def deduplicate_nodes(self, nodes: List[Dict]) -> List[Dict]:
         """去重节点"""

@@ -428,8 +428,11 @@ class SubscriptionManager:
 def main():
     if len(sys.argv) < 2:
         print(
-            "用法: python subscription_manager.py [init|select|fetch|update-scores|report]"
+            "用法: python subscription_manager.py [init|select|fetch|update-scores|report|generate-meta]"
         )
+        print("generate-meta用法: generate-meta [max_nodes] [balance]")
+        print("  max_nodes: 最大节点数，默认50")
+        print("  balance: 是否均衡协议，默认true（均衡），false为只按延迟排序")
         sys.exit(1)
 
     command = sys.argv[1]
@@ -445,6 +448,13 @@ def main():
         manager.update_scores()
     elif command == "report":
         manager.generate_report()
+    elif command == "generate-meta":
+        from clashmeta_generator import ClashMetaGenerator
+
+        generator = ClashMetaGenerator()
+        max_nodes = int(sys.argv[2]) if len(sys.argv) > 2 else 50
+        balance = sys.argv[3].lower() != "false" if len(sys.argv) > 3 else True
+        generator.generate(max_nodes=max_nodes, balance_protocols=balance)
     else:
         print(f"未知命令：{command}")
         sys.exit(1)
