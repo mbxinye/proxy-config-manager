@@ -1,0 +1,101 @@
+[
+  {
+    "timestamp": "2026-02-02T19:43:52.615800",
+    "subscriptions": [
+      {
+        "name": "sub_001",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-02T19:48:48.002991",
+    "subscriptions": [
+      {
+        "name": "sub_001",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_002",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-02T20:53:01.927973",
+    "subscriptions": [
+      {
+        "name": "sub_001",
+        "score": 25,
+        "frequency": "suspended",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_002",
+        "score": 25,
+        "frequency": "suspended",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_003",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_004",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_005",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_006",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_008",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_009",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_008",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      }
+    ]
+  }
+]

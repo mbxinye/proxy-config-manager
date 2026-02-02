@@ -17,8 +17,10 @@ output/*.txt
 output/*.md
 subscriptions/*.txt
 
-# 数据文件（自动生成）
-data/
+# 数据文件 - 保留目录但忽略生成内容（数据库文件需要提交）
+data/*.tmp
+data/*.log
+data/*.bak
 
 # 订阅缓存
 subscriptions/

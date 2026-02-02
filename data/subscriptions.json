@@ -1,0 +1,165 @@
+{
+  "subscriptions": [
+    {
+      "url": "https://raw.githubusercontent.com/zhangkaiitugithub/passcro/main/speednodes.yaml",
+      "name": "sub_001",
+      "score": 25,
+      "success_rate": 0.0,
+      "avg_latency": 999,
+      "avg_nodes": 0.0,
+      "valid_nodes": 0.0,
+      "last_used": "2026-02-02T20:49:06.569957",
+      "use_count": 4,
+      "frequency": "suspended",
+      "created_at": "2026-02-02T19:43:21.516934",
+      "history": [
+        {
+          "date": "2026-02-02T19:43:52.615360",
+          "total_nodes": 0,
+          "valid_nodes": 0,
+          "avg_latency": 9999
+        },
+        {
+          "date": "2026-02-02T19:48:48.002511",
+          "total_nodes": 0,
+          "valid_nodes": 0,
+          "avg_latency": 9999
+        },
+        {
+          "date": "2026-02-02T20:53:01.926944",
+          "total_nodes": 0,
+          "valid_nodes": 0,
+          "avg_latency": 9999
+        }
+      ]
+    },
+    {
+      "url": "https://gist.githubusercontent.com/shuaidaoya/9e5cf2749c0ce79932dd9229d9b4162b/raw/all.yaml",
+      "name": "sub_002",
+      "score": 25,
+      "success_rate": 0.0,
+      "avg_latency": 999,
+      "avg_nodes": 0.0,
+      "valid_nodes": 0.0,
+      "last_used": "2026-02-02T20:49:06.569976",
+      "use_count": 3,
+      "frequency": "suspended",
+      "created_at": "2026-02-02T19:47:04.680747",
+      "history": [
+        {
+          "date": "2026-02-02T19:48:48.002536",
+          "total_nodes": 0,
+          "valid_nodes": 0,
+          "avg_latency": 9999
+        },
+        {
+          "date": "2026-02-02T20:53:01.927011",
+          "total_nodes": 0,
+          "valid_nodes": 0,
+          "avg_latency": 9999
+        }
+      ]
+    },
+    {
+      "url": "https://raw.githubusercontent.com/snakem982/proxypool/main/source/clash-meta.yaml",
+      "name": "sub_003",
+      "score": 75,
+      "success_rate": 0,
+      "avg_latency": 999,
+      "avg_nodes": 0,
+      "valid_nodes": 0,
+      "last_used": "2026-02-02T21:54:40.561003",
+      "use_count": 9,
+      "frequency": "new",
+      "created_at": "2026-02-02T20:48:48.174549",
+      "history": []
+    },
+    {
+      "url": "https://raw.githubusercontent.com/ts-sf/fly/main/clash",
+      "name": "sub_004",
+      "score": 75,
+      "success_rate": 0,
+      "avg_latency": 999,
+      "avg_nodes": 0,
+      "valid_nodes": 0,
+      "last_used": "2026-02-02T21:54:40.561016",
+      "use_count": 9,
+      "frequency": "new",
+      "created_at": "2026-02-02T20:48:48.174632",
+      "history": []
+    },
+    {
+      "url": "https://raw.githubusercontent.com/chengaopan/AutoMergePublicNodes/master/list.meta.yml",
+      "name": "sub_005",
+      "score": 75,
+      "success_rate": 0,
+      "avg_latency": 999,
+      "avg_nodes": 0,
+      "valid_nodes": 0,
+      "last_used": "2026-02-02T21:54:40.561019",
+      "use_count": 9,
+      "frequency": "new",
+      "created_at": "2026-02-02T20:48:48.174637",
+      "history": []
+    },
+    {
+      "url": "https://raw.githubusercontent.com/free18/v2ray/refs/heads/main/c.yaml",
+      "name": "sub_006",
+      "score": 75,
+      "success_rate": 0,
+      "avg_latency": 999,
+      "avg_nodes": 0,
+      "valid_nodes": 0,
+      "last_used": "2026-02-02T21:54:40.561021",
+      "use_count": 9,
+      "frequency": "new",
+      "created_at": "2026-02-02T20:48:48.174641",
+      "history": []
+    },
+    {
+      "url": "https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list.meta.yml",
+      "name": "sub_008",
+      "score": 75,
+      "success_rate": 0,
+      "avg_latency": 999,
+      "avg_nodes": 0,
+      "valid_nodes": 0,
+      "last_used": "2026-02-02T21:54:40.561023",
+      "use_count": 9,
+      "frequency": "new",
+      "created_at": "2026-02-02T20:48:48.174646",
+      "history": []
+    },
+    {
+      "url": "https://raw.githubusercontent.com/shaoyouvip/free/refs/heads/main/all.yaml",
+      "name": "sub_009",
+      "score": 75,
+      "success_rate": 0,
+      "avg_latency": 999,
+      "avg_nodes": 0,
+      "valid_nodes": 0,
+      "last_used": "2026-02-02T21:54:40.561025",
+      "use_count": 9,
+      "frequency": "new",
+      "created_at": "2026-02-02T20:48:48.174649",
+      "history": []
+    },
+    {
+      "url": "https://raw.githubusercontent.com/snakem982/proxypool/main/source/clash-meta-2.yaml",
+      "name": "sub_008",
+      "score": 75,
+      "success_rate": 0,
+      "avg_latency": 999,
+      "avg_nodes": 0,
+      "valid_nodes": 0,
+      "last_used": "2026-02-02T21:54:40.561027",
+      "use_count": 8,
+      "frequency": "new",
+      "created_at": "2026-02-02T20:49:06.415845",
+      "history": []
+    }
+  ],
+  "last_update": "2026-02-02T21:54:40.561029",
+  "version": "1.0",
+  "description": "订阅评分数据库"
+}
