@@ -2,8 +2,8 @@ name: Smart Proxy Config Updater - High Performance
 
 on:
   schedule:
-    # 每天北京时间早上8点运行 (UTC 00:00)
-    - cron: '0 0 * * *'
+    # 每3小时运行一次 (UTC 0, 3, 6, 9, 12, 15, 18, 21)
+    - cron: '0 */3 * * *'
   workflow_dispatch:
     inputs:
       force_full_test:
@@ -198,7 +198,7 @@ jobs:
             
             <div class="update-time">
               上次更新时间: <span id="time">Loading...</span><br>
-              下次自动更新: 每天 08:00 (北京时间)
+              下次自动更新: 每3小时
             </div>
           </div>
           
