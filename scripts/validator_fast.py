@@ -114,13 +114,34 @@ class HighPerformanceValidator:
             if not server or not port:
                 return None
 
-            return {
+            node = {
                 "type": proxy_type,
                 "name": name,
                 "server": server,
                 "port": int(port),
                 "raw": f"yaml:{name}",
             }
+
+            if proxy_type == "vless":
+                node["uuid"] = proxy.get("uuid", "")
+                node["flow"] = proxy.get("flow")
+            elif proxy_type == "vmess":
+                node["uuid"] = proxy.get("uuid", "")
+                node["alterId"] = proxy.get("alterId", 0)
+                node["security"] = proxy.get("cipher", "auto")
+            elif proxy_type == "trojan":
+                node["password"] = proxy.get("password", "")
+                node["sni"] = proxy.get("sni")
+            elif proxy_type == "ss":
+                node["password"] = proxy.get("password", "")
+                node["cipher"] = proxy.get("cipher", "aes-256-gcm")
+            elif proxy_type == "ssr":
+                node["password"] = proxy.get("password", "")
+                node["cipher"] = proxy.get("cipher", "aes-256-cfb")
+                node["protocol"] = proxy.get("protocol", "origin")
+                node["obfs"] = proxy.get("obfs", "plain")
+
+            return node
 
         except Exception as e:
             return None
@@ -144,24 +165,38 @@ class HighPerformanceValidator:
         try:
             content = url[5:]
             if "#" in content:
-                content, _ = content.split("#", 1)
+                content, remark = content.split("#", 1)
+                remark = urllib.parse.unquote(remark)
+            else:
+                remark = ""
+
             decoded = base64.b64decode(content + "=" * (4 - len(content) % 4)).decode(
                 "utf-8"
             )
+
             if "@" in decoded:
-                _, server_port = decoded.split("@", 1)
-                if ":" in server_port:
-                    server, port_str = server_port.rsplit(":", 1)
-                    return {
-                        "type": "ss",
-                        "name": f"SS_{server[:15]}",
-                        "server": server,
-                        "port": int(port_str),
-                        "raw": url,
-                    }
+                method_pass, server_port = decoded.split("@", 1)
+                method, password = method_pass.split(":", 1)
+            else:
+                return None
+
+            if ":" in server_port:
+                server, port_str = server_port.rsplit(":", 1)
+                port = int(port_str)
+            else:
+                return None
+
+            return {
+                "type": "ss",
+                "name": remark[:50] or f"SS_{server[:15]}",
+                "server": server,
+                "port": port,
+                "password": password,
+                "cipher": method,
+                "raw": url,
+            }
         except:
-            pass
-        return None
+            return None
 
     def parse_vmess(self, url: str) -> Optional[Dict]:
         try:
@@ -175,6 +210,9 @@ class HighPerformanceValidator:
                 "name": config.get("ps", "VMess")[:50],
                 "server": config.get("add", ""),
                 "port": int(config.get("port", 443)),
+                "uuid": config.get("id", ""),
+                "alterId": int(config.get("aid", 0)),
+                "security": config.get("scy", "auto"),
                 "raw": url,
             }
         except:
@@ -184,13 +222,18 @@ class HighPerformanceValidator:
         try:
             parsed = urllib.parse.urlparse(url)
             server = parsed.hostname
+            password = parsed.username or ""
             if not server:
                 return None
+            query = urllib.parse.parse_qs(parsed.query)
+            name = query.get("remarks", [f"Trojan_{server[:15]}"])[0]
             return {
                 "type": "trojan",
-                "name": f"Trojan_{server[:15]}",
+                "name": urllib.parse.unquote(name)[:50],
                 "server": server,
                 "port": parsed.port or 443,
+                "password": password,
+                "sni": query.get("sni", [None])[0],
                 "raw": url,
             }
         except:
@@ -200,13 +243,18 @@ class HighPerformanceValidator:
         try:
             parsed = urllib.parse.urlparse(url)
             server = parsed.hostname
+            uuid = parsed.username or ""
             if not server:
                 return None
+            query = urllib.parse.parse_qs(parsed.query)
+            name = query.get("remarks", [f"VLESS_{server[:15]}"])[0]
             return {
                 "type": "vless",
-                "name": f"VLESS_{server[:15]}",
+                "name": urllib.parse.unquote(name)[:50],
                 "server": server,
                 "port": parsed.port or 443,
+                "uuid": uuid,
+                "flow": query.get("flow", [None])[0],
                 "raw": url,
             }
         except:
