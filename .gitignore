@@ -1,0 +1,41 @@
+# 项目忽略文件
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+
+# 输出文件（自动生成，不需要提交）
+output/*.json
+output/*.yml
+output/*.txt
+output/*.md
+subscriptions/*.txt
+
+# 数据文件（自动生成）
+data/
+
+# 订阅缓存
+subscriptions/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 日志
+*.log
+
+# 临时文件
+tmp/
+temp/

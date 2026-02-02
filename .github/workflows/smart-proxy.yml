@@ -1,0 +1,173 @@
+name: Smart Proxy Config Updater
+
+on:
+  schedule:
+    # 每天北京时间早上8点运行 (UTC 00:00)
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    inputs:
+      force_full_test:
+        description: '强制测试所有订阅'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  PYTHON_VERSION: '3.11'
+  OUTPUT_DIR: 'output'
+  PAGES_BRANCH: 'gh-pages'
+
+jobs:
+  update-proxy-config:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install requests pyyaml aiohttp asyncio python-socks async_timeout
+    
+    - name: Load subscription database
+      id: load-db
+      run: |
+        if [ -f data/subscriptions.json ]; then
+          echo "Found existing subscription database"
+          cat data/subscriptions.json | jq '.subscriptions | length' | xargs -I {} echo "subscription_count={}" >> $GITHUB_OUTPUT
+        else
+          echo "Creating new subscription database"
+          echo "subscription_count=0" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Initialize subscriptions from text file
+      run: |
+        python scripts/subscription_manager.py init
+    
+    - name: Select subscriptions to process
+      id: select
+      run: |
+        SELECTED=$(python scripts/subscription_manager.py select)
+        echo "Selected subscriptions: $SELECTED"
+        echo "selected=$SELECTED" >> $GITHUB_OUTPUT
+    
+    - name: Fetch and merge subscriptions
+      run: |
+        python scripts/subscription_manager.py fetch
+    
+    - name: Validate nodes
+      id: validate
+      run: |
+        python scripts/validator.py validate
+        echo "total_nodes=$(cat output/validation_stats.json | jq '.total_nodes')" >> $GITHUB_OUTPUT
+        echo "valid_nodes=$(cat output/validation_stats.json | jq '.valid_nodes')" >> $GITHUB_OUTPUT
+    
+    - name: Generate Clash configuration
+      run: |
+        python scripts/clash_generator.py generate
+    
+    - name: Update subscription scores
+      run: |
+        python scripts/subscription_manager.py update-scores
+    
+    - name: Generate summary report
+      run: |
+        python scripts/subscription_manager.py report > output/report.md
+        cat output/report.md
+    
+    - name: Prepare GitHub Pages content
+      run: |
+        mkdir -p pages
+        cp output/clash_config.yml pages/clash.yml
+        cp output/clash_mini.yml pages/clash_mini.yml
+        cp output/report.md pages/README.md
+        
+        # 创建简单的HTML索引页
+        cat > pages/index.html << 'EOF'
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>Smart Proxy Config</title>
+          <style>
+            body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+            h1 { color: #333; }
+            .link-box { background: #f5f5f5; padding: 15px; margin: 10px 0; border-radius: 5px; }
+            .link-box a { color: #0066cc; text-decoration: none; font-size: 16px; }
+            .link-box a:hover { text-decoration: underline; }
+            .info { color: #666; font-size: 14px; margin-top: 5px; }
+          </style>
+        </head>
+        <body>
+          <h1>Smart Proxy Configuration</h1>
+          <p>自动更新的高质量代理配置文件</p>
+          
+          <div class="link-box">
+            <a href="./clash.yml">📄 Clash 完整配置</a>
+            <div class="info">包含50个精选节点，完整分流规则</div>
+          </div>
+          
+          <div class="link-box">
+            <a href="./clash_mini.yml">📄 Clash 精简配置</a>
+            <div class="info">包含20个最优节点，适合移动端</div>
+          </div>
+          
+          <div class="link-box">
+            <a href="./README.md">📊 运行报告</a>
+            <div class="info">查看本次更新的详细统计信息</div>
+          </div>
+          
+          <hr>
+          <p style="color: #999; font-size: 12px;">
+            上次更新: $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+          </p>
+        </body>
+        </html>
+        EOF
+    
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./pages
+        publish_branch: ${{ env.PAGES_BRANCH }}
+        force_orphan: true
+    
+    - name: Commit subscription database updates
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add data/subscriptions.json data/score_history.json
+        git diff --cached --quiet || (git commit -m "Update subscription scores [$(date -u '+%Y-%m-%d')]" && git push)
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: proxy-configs
+        path: |
+          output/clash_config.yml
+          output/clash_mini.yml
+          output/report.md
+          output/validation_stats.json
+        retention-days: 7
+    
+    - name: Summary
+      run: |
+        echo "## 智能代理配置更新完成" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "- 📊 处理了: ${{ steps.select.outputs.selected }} 个订阅" >> $GITHUB_STEP_SUMMARY
+        echo "- 🌐 总节点数: ${{ steps.validate.outputs.total_nodes }}" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ 有效节点: ${{ steps.validate.outputs.valid_nodes }}" >> $GITHUB_STEP_SUMMARY
+        echo "- 📄 配置文件: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/clash.yml" >> $GITHUB_STEP_SUMMARY
