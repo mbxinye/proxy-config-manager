@@ -58,6 +58,7 @@ PROXY_BATCH_SIZE=20       # Concurrent node tests per batch
 PROXY_BATCH_DELAY=0.5     # Delay between batches (seconds)
 PROXY_MAX_LATENCY=2000    # Maximum allowed latency (ms)
 PROXY_VALIDATION_MODE=strict  # Validation mode: strict|lenient
+PROXY_MAX_OUTPUT_NODES=200   # Maximum output nodes for final config
 ```
 
 ## Code Style Guidelines

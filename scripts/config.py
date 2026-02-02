@@ -44,6 +44,10 @@ class Config:
     # lenient: DNS解析测试（宽松）
     VALIDATION_MODE = os.getenv("PROXY_VALIDATION_MODE", "strict")
 
+    # 最终输出的最大节点数量
+    # 选取延迟最低的优质节点生成配置文件
+    MAX_OUTPUT_NODES = int(os.getenv("PROXY_MAX_OUTPUT_NODES", "200"))  # 默认200个
+
     @classmethod
     def to_dict(cls) -> Dict[str, Any]:
         """导出配置为字典"""
@@ -56,6 +60,7 @@ class Config:
             "batch_delay": cls.BATCH_DELAY,
             "max_latency_ms": cls.MAX_LATENCY_MS,
             "validation_mode": cls.VALIDATION_MODE,
+            "max_output_nodes": cls.MAX_OUTPUT_NODES,
         }
 
     @classmethod
@@ -70,6 +75,7 @@ class Config:
         print(f"  批次延迟: {cls.BATCH_DELAY}秒")
         print(f"  最大延迟: {cls.MAX_LATENCY_MS}ms")
         print(f"  验证模式: {cls.VALIDATION_MODE}")
+        print(f"  最大输出节点: {cls.MAX_OUTPUT_NODES}个")
 
 
 # 兼容性导出
@@ -80,3 +86,4 @@ HTTP_TIMEOUT = Config.HTTP_TIMEOUT
 VALIDATION_BATCH_SIZE = Config.VALIDATION_BATCH_SIZE
 BATCH_DELAY = Config.BATCH_DELAY
 MAX_LATENCY_MS = Config.MAX_LATENCY_MS
+MAX_OUTPUT_NODES = Config.MAX_OUTPUT_NODES

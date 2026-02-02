@@ -452,7 +452,7 @@ def main():
         from clashmeta_generator import ClashMetaGenerator
 
         generator = ClashMetaGenerator()
-        max_nodes = int(sys.argv[2]) if len(sys.argv) > 2 else 50
+        max_nodes = int(sys.argv[2]) if len(sys.argv) > 2 else Config.MAX_OUTPUT_NODES
         balance = sys.argv[3].lower() != "false" if len(sys.argv) > 3 else True
         generator.generate(max_nodes=max_nodes, balance_protocols=balance)
     else:

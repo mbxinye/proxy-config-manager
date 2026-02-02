@@ -11,6 +11,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
 
+from config import Config
+
 
 class ClashMetaGenerator:
     def __init__(self):
@@ -543,7 +545,7 @@ class ClashMetaGenerator:
 
 def main():
     generator = ClashMetaGenerator()
-    generator.generate()
+    generator.generate(max_nodes=Config.MAX_OUTPUT_NODES)
 
 
 if __name__ == "__main__":
