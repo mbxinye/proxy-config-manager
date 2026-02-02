@@ -85,8 +85,8 @@ jobs:
     
     - name: Generate Clash configuration
       run: |
-        echo "📝 生成Clash.meta配置（支持Hysteria2/Tuic等协议）..."
-        python scripts/clashmeta_generator.py
+        echo "📝 生成Clash配置（支持Hysteria2/Tuic/anytls等协议）..."
+        python scripts/clash_generator.py generate
     
     - name: Generate report
       run: |

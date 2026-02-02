@@ -140,6 +140,22 @@ class HighPerformanceValidator:
                 node["cipher"] = proxy.get("cipher", "aes-256-cfb")
                 node["protocol"] = proxy.get("protocol", "origin")
                 node["obfs"] = proxy.get("obfs", "plain")
+            elif proxy_type == "hysteria2":
+                node["password"] = proxy.get("password", "")
+                node["up"] = proxy.get("up", 100)
+                node["down"] = proxy.get("down", 100)
+                node["sni"] = proxy.get("sni")
+                node["skip-cert-verify"] = proxy.get("skip-cert-verify", False)
+            elif proxy_type == "tuic":
+                node["uuid"] = proxy.get("uuid", "")
+                node["password"] = proxy.get("password", "")
+                node["sni"] = proxy.get("sni")
+                node["congestion_control"] = proxy.get("congestion_control", "bbr")
+            elif proxy_type == "anytls":
+                node["uuid"] = proxy.get("uuid", "")
+                node["password"] = proxy.get("password", "")
+                node["sni"] = proxy.get("sni")
+                node["skip-cert-verify"] = proxy.get("skip-cert-verify", False)
 
             return node
 

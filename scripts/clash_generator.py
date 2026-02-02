@@ -11,6 +11,18 @@ from typing import Dict, List, Optional
 
 
 class ClashGenerator:
+    PROTOCOL_PRIORITY = {
+        "vless": 1,
+        "vmess": 2,
+        "trojan": 3,
+        "hysteria2": 4,
+        "tuic": 5,
+        "anytls": 6,
+        "ss": 7,
+        "ssr": 8,
+        "socks5": 9,
+    }
+
     def __init__(self):
         self.output_dir = Path("output")
         self.template_dir = Path("templates")
@@ -28,6 +40,62 @@ class ClashGenerator:
         with open(nodes_file, "r", encoding="utf-8") as f:
             return json.load(f)
 
+    def _get_protocol_priority(self, node: Dict) -> int:
+        """获取节点协议优先级（数值越小优先级越高）"""
+        node_type = node.get("type", "").lower()
+        return self.PROTOCOL_PRIORITY.get(node_type, 999)
+
+    def sort_nodes_by_priority(
+        self, nodes: List[Dict], max_nodes: int = 200, balance_protocols: bool = True
+    ) -> List[Dict]:
+        """按协议优先级和延迟排序节点"""
+        if not nodes:
+            return []
+
+        if balance_protocols:
+            balanced_nodes = []
+            protocol_groups = {}
+
+            for node in nodes:
+                node_type = node.get("type", "unknown")
+                if node_type not in protocol_groups:
+                    protocol_groups[node_type] = []
+                protocol_groups[node_type].append(node)
+
+            protocol_order = [
+                "vless",
+                "vmess",
+                "trojan",
+                "hysteria2",
+                "tuic",
+                "anytls",
+                "ss",
+                "ssr",
+                "socks5",
+            ]
+
+            max_per_protocol = max_nodes // len(protocol_order)
+
+            for proto in protocol_order:
+                if proto in protocol_groups:
+                    proto_nodes = sorted(
+                        protocol_groups[proto],
+                        key=lambda x: x.get("latency", float("inf")),
+                    )
+                    balanced_nodes.extend(proto_nodes[:max_per_protocol])
+
+            nodes = balanced_nodes
+
+        nodes = sorted(
+            nodes,
+            key=lambda x: (
+                self._get_protocol_priority(x),
+                x.get("latency", float("inf")),
+            ),
+        )
+
+        return nodes[:max_nodes]
+
     def node_to_clash(self, node: Dict) -> Optional[Dict]:
         """将节点转换为Clash格式，优化Shadowrocket兼容性"""
         node_type = node.get("type", "")
@@ -42,6 +110,12 @@ class ClashGenerator:
             return self._convert_trojan(node)
         elif node_type == "vless":
             return self._convert_vless(node)
+        elif node_type == "hysteria2":
+            return self._convert_hysteria2(node)
+        elif node_type == "tuic":
+            return self._convert_tuic(node)
+        elif node_type == "anytls":
+            return self._convert_anytls(node)
 
         return None
 
@@ -229,6 +303,46 @@ class ClashGenerator:
 
         return clash_node
 
+    def _convert_hysteria2(self, node: Dict) -> Dict:
+        """转换Hysteria2节点为Clash格式"""
+        return {
+            "name": self._sanitize_name(node.get("name", "Hysteria2")),
+            "type": "hysteria2",
+            "server": node.get("server", ""),
+            "port": node.get("port", 443),
+            "password": node.get("password", ""),
+            "up": node.get("up", 100),
+            "down": node.get("down", 100),
+            "sni": node.get("sni", ""),
+            "skip-cert-verify": node.get("skip-cert-verify", False),
+        }
+
+    def _convert_tuic(self, node: Dict) -> Dict:
+        """转换Tuic节点为Clash格式"""
+        return {
+            "name": self._sanitize_name(node.get("name", "Tuic")),
+            "type": "tuic",
+            "server": node.get("server", ""),
+            "port": node.get("port", 443),
+            "uuid": node.get("uuid", ""),
+            "password": node.get("password", ""),
+            "sni": node.get("sni", ""),
+            "congestion_control": node.get("congestion_control", "bbr"),
+        }
+
+    def _convert_anytls(self, node: Dict) -> Dict:
+        """转换anytls节点为Clash格式"""
+        return {
+            "name": self._sanitize_name(node.get("name", "anyTLS")),
+            "type": "anytls",
+            "server": node.get("server", ""),
+            "port": node.get("port", 443),
+            "uuid": node.get("uuid", ""),
+            "password": node.get("password", ""),
+            "sni": node.get("sni", ""),
+            "skip-cert-verify": node.get("skip-cert-verify", False),
+        }
+
     def _sanitize_name(self, name: str) -> str:
         """清理节点名称，移除可能导致YAML解析问题的字符"""
         # 移除或替换特殊字符
@@ -265,8 +379,14 @@ class ClashGenerator:
             print("错误: 没有可用节点")
             return None
 
-        # 选择前50个节点
-        selected_nodes = nodes[: self.max_nodes_full]
+        # 按协议优先级和延迟排序
+        selected_nodes = self.sort_nodes_by_priority(
+            nodes, self.max_nodes_full, balance_protocols=True
+        )
+
+        print(
+            f"✓ 选取 {len(selected_nodes)} 个最优节点（协议优先级: VLESS > VMess > Trojan > Hysteria2 > Tuic > anyTLS > SS > SSR > SOCKS5）"
+        )
 
         # 转换为Clash格式
         clash_nodes = []
