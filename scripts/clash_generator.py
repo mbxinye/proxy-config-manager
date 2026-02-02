@@ -14,8 +14,8 @@ class ClashGenerator:
     def __init__(self):
         self.output_dir = Path("output")
         self.template_dir = Path("templates")
-        self.max_nodes_full = 50  # 完整版节点数
-        self.max_nodes_mini = 20  # 精简版节点数
+        self.max_nodes_full = 200  # 完整版节点数
+        self.max_nodes_mini = 50  # 精简版节点数
 
     def load_valid_nodes(self) -> List[Dict]:
         """加载已验证的节点"""
