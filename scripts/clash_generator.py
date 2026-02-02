@@ -4,6 +4,7 @@ Clash配置生成器 - Shadowrocket兼容版
 生成带完整分流规则的Clash配置文件，完全兼容Shadowrocket iOS应用
 """
 
+import asyncio
 import json
 import sys
 from pathlib import Path
@@ -26,8 +27,26 @@ class ClashGenerator:
     def __init__(self):
         self.output_dir = Path("output")
         self.template_dir = Path("templates")
-        self.max_nodes_full = 200  # 完整版节点数
-        self.max_nodes_mini = 50  # 精简版节点数
+        self.max_nodes_full = 200
+        self.max_nodes_mini = 50
+        self.rename_nodes_enabled = True
+
+    def _rename_nodes_by_location(self, nodes: List[Dict]) -> List[Dict]:
+        """根据地理位置重命名节点"""
+        if not self.rename_nodes_enabled:
+            return nodes
+
+        try:
+            from node_renamer import NodeRenamer
+
+            renamer = NodeRenamer()
+            return asyncio.run(renamer.rename_nodes(nodes))
+        except ImportError:
+            print("  ⚠️  未找到node_renamer模块，跳过节点重命名")
+            return nodes
+        except Exception as e:
+            print(f"  ⚠️  节点重命名失败: {e}")
+            return nodes
 
     def load_valid_nodes(self) -> List[Dict]:
         """加载已验证的节点"""
@@ -1066,6 +1085,10 @@ class ClashGenerator:
             return False
 
         print(f"📊 加载到 {len(nodes)} 个有效节点")
+
+        # 根据地理位置重命名节点
+        print("\n🌍 开始根据IP地理位置重命名节点...")
+        nodes = self._rename_nodes_by_location(nodes)
         print()
 
         # 生成完整版配置

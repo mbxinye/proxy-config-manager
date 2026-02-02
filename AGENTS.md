@@ -43,8 +43,11 @@ python3 scripts/subscription_manager.py update-scores  # Update subscription sco
 python3 scripts/subscription_manager.py report    # Generate report
 python3 scripts/subscription_manager.py generate-meta [max_nodes] [balance]  # Generate Clash.meta configs
 
-# Generate Clash.meta config directly
-python3 scripts/clashmeta_generator.py [max_nodes] [balance]
+# Generate Clash config directly
+python3 scripts/clash_generator.py generate
+
+# Rename nodes by geographic location
+python3 scripts/node_renamer.py [input_file] [output_file]
 ```
 
 ### Environment Variables
@@ -189,3 +192,5 @@ decoded = base64.b64decode(content + "=" * (4 - len(content) % 4))
 - Output files: `output/` directory
 - Data files: `data/` directory
 - Subscription URLs managed in `subscriptions.txt`
+- Node renaming: Nodes are automatically renamed by geographic location (flag + country/city)
+- IP geolocation cached in `data/ip_cache.json` for performance
