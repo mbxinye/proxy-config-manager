@@ -703,6 +703,13 @@ class SubscriptionManager:
 
         report = "\n".join(lines)
         print(report)
+
+        # 保存报告到文件
+        report_file = self.output_dir / "report.md"
+        with open(report_file, "w", encoding="utf-8") as f:
+            f.write(report)
+        print(f"✓ 报告已保存到 {report_file}")
+
         return report
 
 
