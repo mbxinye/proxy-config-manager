@@ -15,20 +15,26 @@ import urllib.parse
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
+import aiohttp
+
 from config import Config
 
 
 class HighPerformanceValidator:
     """高性能验证器 - 使用高并发"""
 
+    HTTP_TEST_URL = "http://www.google.com/generate_204"
+
     def __init__(self, verbose: bool = True, max_concurrent: int = 100):
         self.output_dir = Path("output")
         self.data_dir = Path("data")
         self.timeout = Config.TCP_CONNECT_TIMEOUT
+        self.http_timeout = Config.HTTP_TIMEOUT
         self.max_latency = Config.MAX_LATENCY_MS
         self.verbose = verbose
         self.max_concurrent = max_concurrent
         self.failed_reasons: Dict[str, int] = {}
+        self.http_failed_reasons: Dict[str, int] = {}
         self.subscription_scores: Dict[str, int] = self._load_subscription_scores()
 
     def log(self, message: str):
@@ -330,6 +336,76 @@ class HighPerformanceValidator:
             except Exception as e:
                 return False, float("inf"), f"错误"
 
+    def _build_proxy_url(self, node: Dict) -> Optional[str]:
+        """Build proxy URL from node configuration for aiohttp"""
+        try:
+            proxy_type = node.get("type", "").lower()
+            server = node.get("server", "")
+            port = node.get("port", 0)
+
+            if not server or not port:
+                return None
+
+            if proxy_type == "ss":
+                auth = f"{node.get('password', '')}"
+                return f"http://{server}:{port}"
+            elif proxy_type == "trojan":
+                password = node.get("password", "")
+                return f"http://{password}@{server}:{port}"
+            elif proxy_type == "vmess":
+                return f"http://{server}:{port}"
+            elif proxy_type == "vless":
+                uuid = node.get("uuid", "")
+                return f"http://{uuid}@{server}:{port}"
+            else:
+                return f"http://{server}:{port}"
+        except Exception:
+            return None
+
+    async def test_http_connectivity(
+        self, node: Dict, semaphore: asyncio.Semaphore
+    ) -> Tuple[bool, float, str]:
+        """Test HTTP connectivity through the proxy node"""
+        proxy_url = self._build_proxy_url(node)
+        if not proxy_url:
+            return False, float("inf"), "HTTP: 无法构建代理URL"
+
+        async with semaphore:
+            try:
+                start_time = time.time()
+
+                timeout = aiohttp.ClientTimeout(total=self.http_timeout)
+                connector = aiohttp.TCPConnector(ssl=False)
+
+                async with aiohttp.ClientSession(
+                    timeout=timeout, connector=connector
+                ) as session:
+                    try:
+                        async with session.get(
+                            self.HTTP_TEST_URL, proxy=proxy_url, allow_redirects=True
+                        ) as response:
+                            latency = (time.time() - start_time) * 1000
+
+                            if response.status in (204, 200, 301, 302):
+                                return True, latency, "HTTP连接成功"
+                            else:
+                                return False, latency, f"HTTP: 状态码 {response.status}"
+                    except aiohttp.ClientProxyConnectionError:
+                        return False, float("inf"), "HTTP: 代理连接失败"
+                    except aiohttp.ClientHttpProxyError as e:
+                        return False, float("inf"), f"HTTP: 代理错误 {e.status}"
+                    except aiohttp.ClientConnectorError:
+                        return False, float("inf"), "HTTP: 连接失败"
+                    except asyncio.TimeoutError:
+                        return False, float("inf"), "HTTP: 请求超时"
+                    except aiohttp.ClientError as e:
+                        return False, float("inf"), f"HTTP: 客户端错误 {str(e)[:30]}"
+
+            except asyncio.TimeoutError:
+                return False, float("inf"), "HTTP: 会话超时"
+            except Exception as e:
+                return False, float("inf"), f"HTTP: 错误 {str(e)[:30]}"
+
     async def validate_all_fast(self):
         """高速验证所有节点"""
         print("=" * 70)
@@ -383,44 +459,75 @@ class HighPerformanceValidator:
                 unique_nodes.append(node)
 
         print(f"\n✓ 共 {len(unique_nodes)} 个唯一节点")
-        print(f"🔍 开始高并发验证...")
+        print(f"🔍 开始高并发验证（TCP + HTTP 两阶段）...")
         print("")
 
-        # 高并发验证所有节点
         start_time = time.time()
-
-        # 创建信号量控制并发
         semaphore = asyncio.Semaphore(self.max_concurrent)
 
-        # 创建所有任务
-        tasks = [
+        # Phase 1: TCP test for all nodes
+        print("📡 阶段1: TCP端口连接测试...")
+        tcp_tasks = [
             self.test_tcp_connect_semaphore(node["server"], node["port"], semaphore)
             for node in unique_nodes
         ]
+        tcp_results = await asyncio.gather(*tcp_tasks, return_exceptions=True)
 
-        # 并发执行所有任务
-        results = await asyncio.gather(*tasks, return_exceptions=True)
-
-        # 处理结果
-        valid_nodes = []
-        for node, result in zip(unique_nodes, results):
-            # 跳过异常结果
+        tcp_passed_nodes = []
+        tcp_failed_count = 0
+        for node, result in zip(unique_nodes, tcp_results):
             if isinstance(result, Exception):
+                tcp_failed_count += 1
                 continue
-
             try:
-                # result 应该是 (bool, float, str) 元组
                 if isinstance(result, tuple) and len(result) == 3:
                     is_valid, latency, reason = result
                     if is_valid:
-                        node["latency"] = latency
-                        valid_nodes.append(node)
+                        node["tcp_latency"] = latency
+                        tcp_passed_nodes.append(node)
                     else:
                         self.failed_reasons[reason] = (
                             self.failed_reasons.get(reason, 0) + 1
                         )
+                        tcp_failed_count += 1
             except Exception:
-                pass
+                tcp_failed_count += 1
+
+        print(f"  ✓ TCP通过: {len(tcp_passed_nodes)} 个节点")
+        print(f"  ✗ TCP失败: {tcp_failed_count} 个节点")
+
+        # Phase 2: HTTP test for nodes that passed TCP
+        print(f"\n🌐 阶段2: HTTP代理连接测试（测试 {len(tcp_passed_nodes)} 个节点）...")
+        http_tasks = [
+            self.test_http_connectivity(node, semaphore) for node in tcp_passed_nodes
+        ]
+        http_results = await asyncio.gather(*http_tasks, return_exceptions=True)
+
+        valid_nodes = []
+        http_passed_count = 0
+        http_failed_count = 0
+        for node, result in zip(tcp_passed_nodes, http_results):
+            if isinstance(result, Exception):
+                self.http_failed_reasons["HTTP: 异常错误"] = (
+                    self.http_failed_reasons.get("HTTP: 异常错误", 0) + 1
+                )
+                http_failed_count += 1
+                continue
+            try:
+                if isinstance(result, tuple) and len(result) == 3:
+                    is_valid, http_latency, reason = result
+                    if is_valid:
+                        node["latency"] = http_latency
+                        node["http_test_passed"] = True
+                        valid_nodes.append(node)
+                        http_passed_count += 1
+                    else:
+                        self.http_failed_reasons[reason] = (
+                            self.http_failed_reasons.get(reason, 0) + 1
+                        )
+                        http_failed_count += 1
+            except Exception:
+                http_failed_count += 1
 
         elapsed = time.time() - start_time
 
@@ -432,13 +539,20 @@ class HighPerformanceValidator:
         # 保存验证统计
         validation_stats = {
             "timestamp": time.time(),
-            "mode": "strict-fast",
+            "mode": "strict-fast-tcp-http",
             "total_nodes": len(unique_nodes),
+            "tcp_passed_nodes": len(tcp_passed_nodes),
+            "http_passed_nodes": len(valid_nodes),
+            "tcp_only_failed": tcp_failed_count,
+            "http_failed": http_failed_count,
             "valid_nodes": len(valid_nodes),
             "success_rate": len(valid_nodes) / max(len(unique_nodes), 1),
+            "tcp_success_rate": len(tcp_passed_nodes) / max(len(unique_nodes), 1),
+            "http_success_rate": len(valid_nodes) / max(len(tcp_passed_nodes), 1),
             "elapsed_time": elapsed,
             "nodes_per_second": len(unique_nodes) / elapsed if elapsed > 0 else 0,
-            "failure_reasons": self.failed_reasons,
+            "tcp_failure_reasons": self.failed_reasons,
+            "http_failure_reasons": self.http_failed_reasons,
         }
 
         with open(
@@ -460,16 +574,36 @@ class HighPerformanceValidator:
         print(f"✨ 验证完成！耗时: {elapsed:.1f}秒")
         print(f"{'=' * 70}")
         print(f"总节点: {len(unique_nodes)}")
-        print(f"有效: {len(valid_nodes)}")
-        print(f"有效率: {len(valid_nodes) / max(len(unique_nodes), 1) * 100:.1f}%")
+        print(
+            f"TCP通过: {len(tcp_passed_nodes)} ({len(tcp_passed_nodes) / max(len(unique_nodes), 1) * 100:.1f}%)"
+        )
+        print(
+            f"HTTP通过: {len(valid_nodes)} ({len(valid_nodes) / max(len(unique_nodes), 1) * 100:.1f}%)"
+        )
         if elapsed > 0:
             print(f"速度: {len(unique_nodes) / elapsed:.0f} 节点/秒")
 
+        if self.failed_reasons:
+            print(f"\n📊 TCP失败原因:")
+            for reason, count in sorted(
+                self.failed_reasons.items(), key=lambda x: -x[1]
+            )[:5]:
+                print(f"  • {reason}: {count}")
+
+        if self.http_failed_reasons:
+            print(f"\n📊 HTTP失败原因:")
+            for reason, count in sorted(
+                self.http_failed_reasons.items(), key=lambda x: -x[1]
+            )[:5]:
+                print(f"  • {reason}: {count}")
+
         if valid_nodes:
-            print(f"\n🏆 前10个最优节点:")
+            print(f"\n🏆 前10个最优节点（HTTP延迟）:")
             for i, node in enumerate(valid_nodes[:10], 1):
+                latency = node.get("latency", 9999)
+                tcp_latency = node.get("tcp_latency", 0)
                 print(
-                    f"  {i:2}. {node['name'][:40]} [{node['type']}] {node['latency']:.1f}ms"
+                    f"  {i:2}. {node['name'][:40]} [{node['type']}] HTTP:{latency:.1f}ms (TCP:{tcp_latency:.1f}ms)"
                 )
 
         print(f"\n{'=' * 70}")
