@@ -33,12 +33,17 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    
+
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
         python-version: ${{ env.PYTHON_VERSION }}
-    
+
+    - name: Clear pip cache
+      run: |
+        pip cache purge
+        echo "✓ pip cache cleared"
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
