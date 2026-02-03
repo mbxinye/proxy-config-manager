@@ -23,16 +23,35 @@ class HighPerformanceValidator:
 
     def __init__(self, verbose: bool = True, max_concurrent: int = 100):
         self.output_dir = Path("output")
+        self.data_dir = Path("data")
         self.timeout = Config.TCP_CONNECT_TIMEOUT
         self.max_latency = Config.MAX_LATENCY_MS
         self.verbose = verbose
         self.max_concurrent = max_concurrent
         self.failed_reasons: Dict[str, int] = {}
+        self.subscription_scores: Dict[str, int] = self._load_subscription_scores()
 
     def log(self, message: str):
         """打印日志"""
         if self.verbose:
             print(message)
+
+    def _load_subscription_scores(self) -> Dict[str, int]:
+        """加载订阅评分，返回URL到评分的映射"""
+        scores = {}
+        db_path = self.data_dir / "subscriptions.json"
+        if db_path.exists():
+            try:
+                with open(db_path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                    for sub in data.get("subscriptions", []):
+                        url = sub.get("url", "")
+                        score = sub.get("score", 50)
+                        if url:
+                            scores[url] = score
+            except Exception:
+                pass
+        return scores
 
     def parse_subscription(self, content: str) -> List[Dict]:
         """解析订阅内容"""
@@ -328,15 +347,22 @@ class HighPerformanceValidator:
             subscriptions = json.load(f)
 
         all_nodes = []
+        node_source_map: Dict[str, str] = {}  # node_key -> subscription_url
 
         # 解析所有订阅
         print("📥 解析订阅内容...")
         for sub in subscriptions:
             content = sub.get("content")
+            url = sub.get("url", "")
             if content:
                 nodes = self.parse_subscription(content)
+                # 记录每个节点的来源订阅
+                for node in nodes:
+                    node_key = f"{node['server']}:{node['port']}"
+                    node_source_map[node_key] = url
                 all_nodes.extend(nodes)
-                print(f"  ✓ {sub['url'][:50]}... - {len(nodes)} 个节点")
+                score = self.subscription_scores.get(url, 0)
+                print(f"  ✓ {url[:50]}... - {len(nodes)} 个节点 (评分: {score})")
 
         if not all_nodes:
             print("\n⚠️  没有解析到任何节点")
@@ -349,6 +375,11 @@ class HighPerformanceValidator:
             key = f"{node['server']}:{node['port']}"
             if key not in seen:
                 seen.add(key)
+                # 添加订阅来源信息
+                node["subscription_url"] = node_source_map.get(key, "")
+                node["subscription_score"] = self.subscription_scores.get(
+                    node["subscription_url"], 0
+                )
                 unique_nodes.append(node)
 
         print(f"\n✓ 共 {len(unique_nodes)} 个唯一节点")
@@ -393,8 +424,10 @@ class HighPerformanceValidator:
 
         elapsed = time.time() - start_time
 
-        # 排序
-        valid_nodes.sort(key=lambda x: x.get("latency", 9999))
+        # 排序：优先按订阅评分降序，然后按延迟升序
+        valid_nodes.sort(
+            key=lambda x: (-x.get("subscription_score", 0), x.get("latency", 9999))
+        )
 
         # 保存验证统计
         validation_stats = {
@@ -415,6 +448,12 @@ class HighPerformanceValidator:
 
         with open(self.output_dir / "valid_nodes.json", "w", encoding="utf-8") as f:
             json.dump(valid_nodes, f, indent=2, ensure_ascii=False)
+
+        # 保存订阅评分映射表供后续使用
+        with open(
+            self.output_dir / "subscription_scores.json", "w", encoding="utf-8"
+        ) as f:
+            json.dump(self.subscription_scores, f, indent=2, ensure_ascii=False)
 
         # 统计
         print(f"\n{'=' * 70}")

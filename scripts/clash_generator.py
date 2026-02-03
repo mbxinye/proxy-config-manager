@@ -64,10 +64,14 @@ class ClashGenerator:
         node_type = node.get("type", "").lower()
         return self.PROTOCOL_PRIORITY.get(node_type, 999)
 
+    def _get_subscription_score(self, node: Dict) -> int:
+        """获取节点所属订阅的评分（数值越大质量越好）"""
+        return node.get("subscription_score", 0)
+
     def sort_nodes_by_priority(
         self, nodes: List[Dict], max_nodes: int = 200, balance_protocols: bool = True
     ) -> List[Dict]:
-        """按协议优先级和延迟排序节点"""
+        """按订阅评分、协议优先级和延迟排序节点"""
         if not nodes:
             return []
 
@@ -97,18 +101,24 @@ class ClashGenerator:
 
             for proto in protocol_order:
                 if proto in protocol_groups:
+                    # 在同一协议内，按订阅评分降序，然后按延迟升序
                     proto_nodes = sorted(
                         protocol_groups[proto],
-                        key=lambda x: x.get("latency", float("inf")),
+                        key=lambda x: (
+                            -self._get_subscription_score(x),
+                            x.get("latency", float("inf")),
+                        ),
                     )
                     balanced_nodes.extend(proto_nodes[:max_per_protocol])
 
             nodes = balanced_nodes
 
+        # 最终排序：协议优先级 > 订阅评分(降序) > 延迟(升序)
         nodes = sorted(
             nodes,
             key=lambda x: (
                 self._get_protocol_priority(x),
+                -self._get_subscription_score(x),  # 负号实现降序
                 x.get("latency", float("inf")),
             ),
         )
@@ -404,7 +414,7 @@ class ClashGenerator:
         )
 
         print(
-            f"✓ 选取 {len(selected_nodes)} 个最优节点（协议优先级: VLESS > VMess > Trojan > Hysteria2 > Tuic > anyTLS > SS > SSR > SOCKS5）"
+            f"✓ 选取 {len(selected_nodes)} 个最优节点（排序规则: 协议优先级 × 订阅评分 × 延迟）"
         )
 
         # 转换为Clash格式

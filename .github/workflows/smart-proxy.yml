@@ -216,14 +216,7 @@ jobs:
         publish_dir: ./pages
         publish_branch: ${{ env.PAGES_BRANCH }}
         force_orphan: true
-    
-    - name: Commit subscription database updates
-      run: |
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add data/subscriptions.json data/score_history.json
-        git diff --cached --quiet || (git commit -m "Update subscription scores [$(date -u '+%Y-%m-%d')]" && git push)
-    
+
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
