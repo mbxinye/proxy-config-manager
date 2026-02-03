@@ -20,7 +20,7 @@ class Config:
 
     BATCH_DELAY = float(os.getenv("PROXY_BATCH_DELAY", "0.01"))
 
-    MAX_LATENCY_MS = int(os.getenv("PROXY_MAX_LATENCY", "2000"))
+    MAX_LATENCY_MS = int(os.getenv("PROXY_MAX_LATENCY", "5000"))
 
     VALIDATION_MODE = os.getenv("PROXY_VALIDATION_MODE", "strict")
 

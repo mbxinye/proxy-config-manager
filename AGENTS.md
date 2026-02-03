@@ -44,7 +44,7 @@ PROXY_SUB_TIMEOUT=30      # Subscription fetch timeout (seconds)
 PROXY_TCP_TIMEOUT=3        # TCP connection test timeout (seconds)
 PROXY_BATCH_SIZE=200       # Concurrent node tests (TCP)
 PROXY_BATCH_DELAY=0.01     # Delay between batches
-PROXY_MAX_LATENCY=2000     # Maximum allowed latency (ms)
+PROXY_MAX_LATENCY=5000     # Maximum allowed latency (ms)
 PROXY_MAX_OUTPUT_NODES=100 # Maximum output nodes
 PROXY_CLASH_TEST_LIMIT=100 # Clash test node limit
 ```
