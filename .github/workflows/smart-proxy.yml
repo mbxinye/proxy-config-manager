@@ -69,9 +69,23 @@ jobs:
     - name: Download existing subscription data from gh-pages
       run: |
         echo "📥 从gh-pages分支下载历史评分数据..."
-        # 尝试从gh-pages分支下载现有数据
-        curl -sL "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/subscriptions.json" -o data/subscriptions.json || echo "⚠️ 未找到历史订阅数据，将创建新数据库"
-        curl -sL "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/score_history.json" -o data/score_history.json || echo "⚠️ 未找到历史评分记录"
+        
+        curl -sL "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/subscriptions.json" -o data/subscriptions.json.tmp
+        if [ -s data/subscriptions.json.tmp ]; then
+          mv data/subscriptions.json.tmp data/subscriptions.json
+        else
+          rm -f data/subscriptions.json.tmp
+          echo "⚠️ 未找到历史订阅数据，将创建新数据库"
+        fi
+        
+        curl -sL "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/score_history.json" -o data/score_history.json.tmp
+        if [ -s data/score_history.json.tmp ]; then
+          mv data/score_history.json.tmp data/score_history.json
+        else
+          rm -f data/score_history.json.tmp
+          echo "⚠️ 未找到历史评分记录"
+        fi
+        
         echo "✓ 数据下载完成"
 
     - name: Initialize subscriptions

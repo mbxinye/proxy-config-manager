@@ -40,9 +40,13 @@ class SubscriptionManager:
         """加载订阅数据库，并迁移旧数据"""
         if self.db_path.exists():
             with open(self.db_path, "r", encoding="utf-8") as f:
-                data = json.load(f)
+                content = f.read()
 
-            # 迁移：为旧订阅添加新字段
+            if not content.strip():
+                return {"subscriptions": [], "last_update": None, "version": "2.0"}
+
+            data = json.loads(content)
+
             for sub in data.get("subscriptions", []):
                 if "consecutive_failures" not in sub:
                     sub["consecutive_failures"] = 0
@@ -52,7 +56,6 @@ class SubscriptionManager:
                     sub["last_score_change"] = 0
                 if "recovery_count" not in sub:
                     sub["recovery_count"] = 0
-                # 将旧的 suspended 状态转换为 recovery
                 if sub.get("frequency") == "suspended":
                     sub["frequency"] = "recovery"
 
