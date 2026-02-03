@@ -45,7 +45,10 @@ class SubscriptionManager:
             if not content.strip():
                 return {"subscriptions": [], "last_update": None, "version": "2.0"}
 
-            data = json.loads(content)
+            try:
+                data = json.loads(content)
+            except json.JSONDecodeError:
+                return {"subscriptions": [], "last_update": None, "version": "2.0"}
 
             for sub in data.get("subscriptions", []):
                 if "consecutive_failures" not in sub:
