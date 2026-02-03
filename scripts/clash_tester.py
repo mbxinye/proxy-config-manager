@@ -364,7 +364,7 @@ class ClashTester:
             clash_node["sni"] = node["sni"]
         return clash_node
 
-    def _convert_vless(self, node: Dict) -> Dict:
+    def _convert_vless(self, node: Dict) -> Optional[Dict]:
         """转换VLESS节点为Clash格式"""
         clash_node = {
             "name": self._sanitize_name(node.get("name", "VLESS Node")),
@@ -377,6 +377,24 @@ class ClashTester:
         }
         if node.get("flow"):
             clash_node["flow"] = node["flow"]
+
+        # REALITY support
+        is_reality = (
+            node.get("network") == "reality" or node.get("type") == "vless-reality"
+        )
+        if is_reality:
+            public_key = node.get("public-key", "")
+            short_id = node.get("short-id", "")
+            if public_key and short_id:
+                clash_node["network"] = "raw"
+                clash_node["reality-opts"] = {
+                    "public-key": public_key,
+                    "short-id": short_id,
+                }
+                clash_node["fingerprint"] = node.get("fingerprint", "chrome")
+            else:
+                return None
+
         return clash_node
 
     def _sanitize_name(self, name: str) -> str:

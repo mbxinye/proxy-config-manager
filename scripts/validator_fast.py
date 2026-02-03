@@ -38,6 +38,7 @@ class HighPerformanceValidator:
         self.max_concurrent = max_concurrent
         self.failed_reasons: Dict[str, int] = {}
         self.clash_failed_reasons: Dict[str, int] = {}
+        self.filtered_for_clash: int = 0
         self.subscription_scores: Dict[str, int] = self._load_subscription_scores()
         self._session: Optional[aiohttp.ClientSession] = None
         self._connector: Optional[aiohttp.TCPConnector] = None
@@ -393,6 +394,24 @@ class HighPerformanceValidator:
             }
             if node.get("flow"):
                 clash_node["flow"] = node["flow"]
+
+            # REALITY support
+            is_reality = (
+                node.get("network") == "reality" or node.get("type") == "vless-reality"
+            )
+            if is_reality:
+                public_key = node.get("public-key", "")
+                short_id = node.get("short-id", "")
+                if public_key and short_id:
+                    clash_node["network"] = "raw"
+                    clash_node["reality-opts"] = {
+                        "public-key": public_key,
+                        "short-id": short_id,
+                    }
+                    clash_node["fingerprint"] = node.get("fingerprint", "chrome")
+                else:
+                    return None  # Skip invalid REALITY config
+
             return clash_node
         elif node_type == "ssr":
             return {
@@ -429,17 +448,23 @@ class HighPerformanceValidator:
             }
         return None
 
-    def generate_clash_config(self, nodes: List[Dict]) -> bool:
-        """生成用于测试的Clash配置"""
+    def generate_clash_config(self, nodes: List[Dict]) -> Tuple[bool, int, int]:
+        """生成用于测试的Clash配置，返回(成功状态, 转换数, 过滤数)"""
         clash_nodes = []
+        filtered_count = 0
         for node in nodes:
             clash_node = self.node_to_clash(node)
             if clash_node:
                 clash_nodes.append(clash_node)
+            else:
+                filtered_count += 1
 
         if not clash_nodes:
             self.log("  ⚠️ 没有可转换的节点")
-            return False
+            return False, 0, filtered_count
+
+        if filtered_count > 0:
+            self.log(f"  ⚠️ 过滤了 {filtered_count} 个无效节点 (REALITY配置不完整等)")
 
         config = {
             "mixed-port": 7890,
@@ -469,7 +494,7 @@ class HighPerformanceValidator:
             )
 
         self.log(f"  ✓ 生成了包含 {len(clash_nodes)} 个节点的Clash测试配置")
-        return True
+        return True, len(clash_nodes), filtered_count
 
     def start_clash(self) -> bool:
         """启动Clash进程"""
@@ -830,9 +855,14 @@ class HighPerformanceValidator:
                 )
 
             try:
-                if not self.generate_clash_config(tcp_passed_nodes):
+                success, clash_node_count, self.filtered_for_clash = (
+                    self.generate_clash_config(tcp_passed_nodes)
+                )
+                if not success:
                     print("  ⚠️ Clash配置生成失败，跳过Clash测试")
                     valid_nodes = tcp_passed_nodes
+                    clash_passed = 0
+                    clash_failed = len(tcp_passed_nodes) - self.filtered_for_clash
                 elif not self.start_clash():
                     print("  ⚠️ Clash启动失败，跳过Clash测试")
                     valid_nodes = tcp_passed_nodes
@@ -852,7 +882,11 @@ class HighPerformanceValidator:
                         valid_nodes = clash_passed_nodes
                         clash_elapsed = time.time() - clash_start_time
                         clash_passed = len(clash_passed_nodes)
-                        clash_failed = len(tcp_passed_nodes) - clash_passed
+                        clash_failed = (
+                            len(tcp_passed_nodes)
+                            - self.filtered_for_clash
+                            - clash_passed
+                        )
             except Exception as e:
                 print(f"  ⚠️ Clash测试出错: {e}")
                 valid_nodes = tcp_passed_nodes
@@ -884,6 +918,7 @@ class HighPerformanceValidator:
             "tcp_failed": tcp_failed_count,
             "clash_passed": clash_passed if "clash_passed" in dir() else 0,
             "clash_failed": clash_failed if "clash_failed" in dir() else 0,
+            "clash_filtered": self.filtered_for_clash,
             "tcp_clash_success_rate": len(valid_nodes) / max(len(unique_nodes), 1),
             "tcp_success_rate": len(tcp_passed_nodes) / max(len(unique_nodes), 1),
             "clash_success_rate": clash_passed / max(len(tcp_passed_nodes), 1)
@@ -922,6 +957,10 @@ class HighPerformanceValidator:
             print(
                 f"Clash通过: {clash_passed} ({clash_passed / max(len(tcp_passed_nodes), 1) * 100:.1f}%)"
             )
+            if self.filtered_for_clash > 0:
+                print(
+                    f"  ⚠️ 过滤无效节点: {self.filtered_for_clash} 个 (REALITY配置不完整)"
+                )
         if tcp_elapsed > 0:
             print(f"TCP速度: {len(unique_nodes) / tcp_elapsed:.0f} 节点/秒")
 
