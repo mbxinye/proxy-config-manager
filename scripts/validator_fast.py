@@ -23,6 +23,19 @@ import yaml
 from config import Config
 
 
+def _is_valid_reality_short_id(short_id: str) -> bool:
+    """验证 REALITY short ID 格式（必须为有效的十六进制字符串）"""
+    if not short_id:
+        return False
+    if len(short_id) < 2 or len(short_id) > 16:
+        return False
+    try:
+        int(short_id, 16)
+        return True
+    except ValueError:
+        return False
+
+
 class HighPerformanceValidator:
     """高性能验证器 - 使用高并发"""
 
@@ -402,7 +415,7 @@ class HighPerformanceValidator:
             if is_reality:
                 public_key = node.get("public-key", "")
                 short_id = node.get("short-id", "")
-                if public_key and short_id:
+                if public_key and short_id and _is_valid_reality_short_id(short_id):
                     clash_node["network"] = "raw"
                     clash_node["reality-opts"] = {
                         "public-key": public_key,
@@ -410,7 +423,11 @@ class HighPerformanceValidator:
                     }
                     clash_node["fingerprint"] = node.get("fingerprint", "chrome")
                 else:
-                    return None  # Skip invalid REALITY config
+                    if not _is_valid_reality_short_id(short_id):
+                        self.failed_reasons["invalid_reality_short_id"] = (
+                            self.failed_reasons.get("invalid_reality_short_id", 0) + 1
+                        )
+                    return None
 
             return clash_node
         elif node_type == "ssr":
