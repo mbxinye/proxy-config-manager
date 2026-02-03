@@ -254,7 +254,7 @@ jobs:
         if [ -f output/validation_stats.json ]; then
           total=$(jq '.total_nodes' output/validation_stats.json)
           valid=$(jq '.valid_nodes' output/validation_stats.json)
-          rate=$(jq '(.valid_nodes / max(.total_nodes,1) * 100 | floor)' output/validation_stats.json)
+          rate=$(jq '(.valid_nodes / ([.total_nodes, 1] | max) * 100 | floor)' output/validation_stats.json)
         else
           total="?"
           valid="?"
