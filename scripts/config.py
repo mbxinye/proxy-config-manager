@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
-全局配置管理
-统一管理超时设置和其他全局参数
+全局配置管理 - 优化版本
 """
 
 import os
@@ -9,48 +8,32 @@ from typing import Dict, Any
 
 
 class Config:
-    """全局配置类"""
+    SUBSCRIPTION_TIMEOUT = int(os.getenv("PROXY_SUB_TIMEOUT", "30"))
 
-    # 订阅获取超时（秒）
-    # 考虑到订阅文件可能很大，需要足够时间
-    SUBSCRIPTION_TIMEOUT = int(os.getenv("PROXY_SUB_TIMEOUT", "45"))  # 默认45秒
+    TCP_CONNECT_TIMEOUT = int(os.getenv("PROXY_TCP_TIMEOUT", "3"))
 
-    # TCP连接测试超时（秒）
-    # 代理节点响应通常较慢，但不能太长
-    TCP_CONNECT_TIMEOUT = int(os.getenv("PROXY_TCP_TIMEOUT", "5"))  # 默认5秒
+    DNS_TIMEOUT = int(os.getenv("PROXY_DNS_TIMEOUT", "2"))
 
-    # DNS解析超时（秒）
-    # DNS解析应该很快
-    DNS_TIMEOUT = int(os.getenv("PROXY_DNS_TIMEOUT", "3"))  # 默认3秒
+    HTTP_TIMEOUT = int(os.getenv("PROXY_HTTP_TIMEOUT", "10"))
 
-    # HTTP请求超时（秒）
-    # 用于单链接测试等场景
-    HTTP_TIMEOUT = int(os.getenv("PROXY_HTTP_TIMEOUT", "15"))  # 默认15秒
+    VALIDATION_BATCH_SIZE = int(os.getenv("PROXY_BATCH_SIZE", "200"))
 
-    # 批次大小（并发数）
-    # 控制同时测试的节点数量，避免被封
-    VALIDATION_BATCH_SIZE = int(os.getenv("PROXY_BATCH_SIZE", "100"))  # 默认100个/批
+    BATCH_DELAY = float(os.getenv("PROXY_BATCH_DELAY", "0.01"))
 
-    # 批次间延迟（秒）
-    # 避免请求过快被封
-    BATCH_DELAY = float(os.getenv("PROXY_BATCH_DELAY", "0.05"))  # 默认0.05秒
+    MAX_LATENCY_MS = int(os.getenv("PROXY_MAX_LATENCY", "2000"))
 
-    # 最大延迟阈值（毫秒）
-    # 超过此延迟的节点会被过滤
-    MAX_LATENCY_MS = int(os.getenv("PROXY_MAX_LATENCY", "2000"))  # 默认2000ms
-
-    # 验证模式
-    # strict: TCP连接测试（严格）
-    # lenient: DNS解析测试（宽松）
     VALIDATION_MODE = os.getenv("PROXY_VALIDATION_MODE", "strict")
 
-    # 最终输出的最大节点数量
-    # 选取延迟最低的优质节点生成配置文件
-    MAX_OUTPUT_NODES = int(os.getenv("PROXY_MAX_OUTPUT_NODES", "200"))  # 默认200个
+    MAX_OUTPUT_NODES = int(os.getenv("PROXY_MAX_OUTPUT_NODES", "100"))
+
+    CLASH_MAX_NODES_FULL = int(os.getenv("CLASH_MAX_NODES_FULL", "200"))
+    CLASH_MAX_NODES_MINI = int(os.getenv("CLASH_MAX_NODES_MINI", "50"))
+    CLASH_RENAME_NODES_ENABLED = (
+        os.getenv("CLASH_RENAME_NODES_ENABLED", "true").lower() == "true"
+    )
 
     @classmethod
     def to_dict(cls) -> Dict[str, Any]:
-        """导出配置为字典"""
         return {
             "subscription_timeout": cls.SUBSCRIPTION_TIMEOUT,
             "tcp_connect_timeout": cls.TCP_CONNECT_TIMEOUT,
@@ -61,24 +44,21 @@ class Config:
             "max_latency_ms": cls.MAX_LATENCY_MS,
             "validation_mode": cls.VALIDATION_MODE,
             "max_output_nodes": cls.MAX_OUTPUT_NODES,
+            "clash_max_nodes_full": cls.CLASH_MAX_NODES_FULL,
+            "clash_max_nodes_mini": cls.CLASH_MAX_NODES_MINI,
+            "clash_rename_nodes_enabled": cls.CLASH_RENAME_NODES_ENABLED,
         }
 
     @classmethod
     def print_config(cls):
-        """打印当前配置"""
-        print("当前超时配置:")
+        print("当前配置:")
         print(f"  订阅获取: {cls.SUBSCRIPTION_TIMEOUT}秒")
         print(f"  TCP连接: {cls.TCP_CONNECT_TIMEOUT}秒")
-        print(f"  DNS解析: {cls.DNS_TIMEOUT}秒")
-        print(f"  HTTP请求: {cls.HTTP_TIMEOUT}秒")
-        print(f"  批次大小: {cls.VALIDATION_BATCH_SIZE}个节点")
-        print(f"  批次延迟: {cls.BATCH_DELAY}秒")
+        print(f"  批次大小: {cls.VALIDATION_BATCH_SIZE}个")
         print(f"  最大延迟: {cls.MAX_LATENCY_MS}ms")
-        print(f"  验证模式: {cls.VALIDATION_MODE}")
-        print(f"  最大输出节点: {cls.MAX_OUTPUT_NODES}个")
+        print(f"  最大输出: {cls.MAX_OUTPUT_NODES}个")
 
 
-# 兼容性导出
 SUBSCRIPTION_TIMEOUT = Config.SUBSCRIPTION_TIMEOUT
 TCP_CONNECT_TIMEOUT = Config.TCP_CONNECT_TIMEOUT
 DNS_TIMEOUT = Config.DNS_TIMEOUT
@@ -87,3 +67,6 @@ VALIDATION_BATCH_SIZE = Config.VALIDATION_BATCH_SIZE
 BATCH_DELAY = Config.BATCH_DELAY
 MAX_LATENCY_MS = Config.MAX_LATENCY_MS
 MAX_OUTPUT_NODES = Config.MAX_OUTPUT_NODES
+CLASH_MAX_NODES_FULL = Config.CLASH_MAX_NODES_FULL
+CLASH_MAX_NODES_MINI = Config.CLASH_MAX_NODES_MINI
+CLASH_RENAME_NODES_ENABLED = Config.CLASH_RENAME_NODES_ENABLED

@@ -47,7 +47,8 @@ class SubscriptionManager:
 
             try:
                 data = json.loads(content)
-            except json.JSONDecodeError:
+            except json.JSONDecodeError as e:
+                print(f"JSON解析错误: {e}")
                 return {"subscriptions": [], "last_update": None, "version": "2.0"}
 
             for sub in data.get("subscriptions", []):
@@ -183,7 +184,7 @@ class SubscriptionManager:
                     longevity_score = 2
             else:
                 longevity_score = 5
-        except:
+        except Exception:
             longevity_score = 5
 
         return variance_score + longevity_score
@@ -419,16 +420,11 @@ class SubscriptionManager:
         return urls
 
     def fetch_subscriptions(self):
-        """获取订阅内容"""
-        import urllib.request
-        import ssl
+        """并行获取订阅内容（高性能）"""
+        import asyncio
+        import aiohttp
+        from pathlib import Path
 
-        # 创建SSL上下文
-        ssl_context = ssl.create_default_context()
-        ssl_context.check_hostname = False
-        ssl_context.verify_mode = ssl.CERT_NONE
-
-        # 读取要获取的URL列表
         urls_file = self.output_dir / "urls_to_fetch.txt"
         if not urls_file.exists():
             print("错误: 未找到要获取的URL列表")
@@ -437,57 +433,92 @@ class SubscriptionManager:
         with open(urls_file, "r", encoding="utf-8") as f:
             urls = [line.strip() for line in f if line.strip()]
 
-        print(f"开始获取 {len(urls)} 个订阅...")
-        print(f"超时设置: {Config.SUBSCRIPTION_TIMEOUT}秒")
+        print(f"开始并行获取 {len(urls)} 个订阅...")
 
-        fetched_data = []
-        for i, url in enumerate(urls):
+        async def fetch_single(
+            session: aiohttp.ClientSession, url: str, index: int
+        ) -> Dict:
             try:
-                print(f"[{i + 1}/{len(urls)}] 获取: {url[:50]}...")
-
-                req = urllib.request.Request(
+                async with session.get(
                     url,
+                    timeout=aiohttp.ClientTimeout(total=Config.SUBSCRIPTION_TIMEOUT),
                     headers={
                         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
                     },
-                )
-
-                with urllib.request.urlopen(
-                    req, timeout=Config.SUBSCRIPTION_TIMEOUT, context=ssl_context
+                    allow_redirects=True,
                 ) as response:
-                    content = response.read()
-
-                    # 尝试解码
+                    content = await response.text()
                     try:
-                        text = content.decode("utf-8")
-                    except:
+                        text = content.encode("utf-8").decode("utf-8")
+                    except UnicodeDecodeError:
                         try:
-                            text = content.decode("gbk")
-                        except:
-                            text = content.decode("utf-8", errors="ignore")
+                            text = content.encode("utf-8").decode("gbk")
+                        except UnicodeDecodeError:
+                            text = content.encode("utf-8", errors="ignore").decode(
+                                "utf-8"
+                            )
 
-                    fetched_data.append({"url": url, "content": text, "index": i + 1})
-
-                    # 保存原始内容
-                    sub_file = self.subs_dir / f"sub_{i + 1:03d}.txt"
+                    sub_file = self.subs_dir / f"sub_{index + 1:03d}.txt"
                     with open(sub_file, "w", encoding="utf-8") as f:
                         f.write(text)
 
-                    print(f"  ✓ 成功获取，长度: {len(text)}")
-
+                    return {
+                        "url": url,
+                        "content": text,
+                        "index": index + 1,
+                        "success": True,
+                    }
+            except asyncio.TimeoutError:
+                return {
+                    "url": url,
+                    "content": None,
+                    "error": "timeout",
+                    "index": index + 1,
+                    "success": False,
+                }
+            except aiohttp.ClientError as e:
+                return {
+                    "url": url,
+                    "content": None,
+                    "error": str(e)[:50],
+                    "index": index + 1,
+                    "success": False,
+                }
             except Exception as e:
-                print(f"  ✗ 获取失败: {str(e)}")
-                fetched_data.append(
-                    {"url": url, "content": None, "error": str(e), "index": i + 1}
-                )
+                return {
+                    "url": url,
+                    "content": None,
+                    "error": str(e)[:50],
+                    "index": index + 1,
+                    "success": False,
+                }
 
-        # 保存获取结果
+        async def fetch_all():
+            connector = aiohttp.TCPConnector(
+                limit=Config.VALIDATION_BATCH_SIZE, limit_per_host=10
+            )
+            timeout = aiohttp.ClientTimeout(total=Config.SUBSCRIPTION_TIMEOUT)
+            async with aiohttp.ClientSession(
+                connector=connector, timeout=timeout
+            ) as session:
+                tasks = [fetch_single(session, url, i) for i, url in enumerate(urls)]
+                return await asyncio.gather(*tasks, return_exceptions=True)
+
+        fetched_data = []
+        success_count = 0
+
+        results = asyncio.run(fetch_all())
+        for result in results:
+            if isinstance(result, Exception):
+                continue
+            fetched_data.append(result)
+            if result.get("success"):
+                success_count += 1
+
         with open(self.output_dir / "fetched_data.json", "w", encoding="utf-8") as f:
             json.dump(fetched_data, f, indent=2, ensure_ascii=False)
 
-        print(
-            f"\n获取完成: {len([x for x in fetched_data if x.get('content')])}/{len(urls)} 成功"
-        )
+        print(f"获取完成: {success_count}/{len(urls)} 成功")
 
     def update_scores(self):
         """更新所有订阅的评分"""
@@ -678,11 +709,8 @@ class SubscriptionManager:
 def main():
     if len(sys.argv) < 2:
         print(
-            "用法: python subscription_manager.py [init|select|fetch|update-scores|report|generate-meta]"
+            "用法: python subscription_manager.py [init|select|fetch|update-scores|report]"
         )
-        print("generate-meta用法: generate-meta [max_nodes] [balance]")
-        print("  max_nodes: 最大节点数，默认50")
-        print("  balance: 是否均衡协议，默认true（均衡），false为只按延迟排序")
         sys.exit(1)
 
     command = sys.argv[1]
@@ -698,13 +726,6 @@ def main():
         manager.update_scores()
     elif command == "report":
         manager.generate_report()
-    elif command == "generate-meta":
-        from clashmeta_generator import ClashMetaGenerator
-
-        generator = ClashMetaGenerator()
-        max_nodes = int(sys.argv[2]) if len(sys.argv) > 2 else Config.MAX_OUTPUT_NODES
-        balance = sys.argv[3].lower() != "false" if len(sys.argv) > 3 else True
-        generator.generate(max_nodes=max_nodes, balance_protocols=balance)
     else:
         print(f"未知命令：{command}")
         sys.exit(1)

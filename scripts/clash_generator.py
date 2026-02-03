@@ -10,6 +10,8 @@ import sys
 from pathlib import Path
 from typing import Dict, List, Optional
 
+from utils import sanitize_name
+
 
 class ClashGenerator:
     PROTOCOL_PRIORITY = {
@@ -25,11 +27,13 @@ class ClashGenerator:
     }
 
     def __init__(self):
+        from config import Config
+
         self.output_dir = Path("output")
         self.template_dir = Path("templates")
-        self.max_nodes_full = 200
-        self.max_nodes_mini = 50
-        self.rename_nodes_enabled = True
+        self.max_nodes_full = Config.CLASH_MAX_NODES_FULL
+        self.max_nodes_mini = Config.CLASH_MAX_NODES_MINI
+        self.rename_nodes_enabled = Config.CLASH_RENAME_NODES_ENABLED
 
     def _rename_nodes_by_location(self, nodes: List[Dict]) -> List[Dict]:
         """根据地理位置重命名节点"""
@@ -151,7 +155,7 @@ class ClashGenerator:
     def _convert_ss(self, node: Dict) -> Dict:
         """转换SS节点为Clash格式"""
         clash_node = {
-            "name": self._sanitize_name(node.get("name", "SS Node")),
+            "name": sanitize_name(node.get("name", "SS Node")),
             "type": "ss",
             "server": node.get("server", ""),
             "port": node.get("port", 0),
@@ -171,7 +175,7 @@ class ClashGenerator:
     def _convert_ssr(self, node: Dict) -> Dict:
         """转换SSR节点为Clash格式"""
         clash_node = {
-            "name": self._sanitize_name(node.get("name", "SSR Node")),
+            "name": sanitize_name(node.get("name", "SSR Node")),
             "type": "ssr",
             "server": node.get("server", ""),
             "port": node.get("port", 0),
@@ -193,7 +197,7 @@ class ClashGenerator:
     def _convert_vmess(self, node: Dict) -> Dict:
         """转换VMess节点为Clash格式"""
         clash_node = {
-            "name": self._sanitize_name(node.get("name", "VMess Node")),
+            "name": sanitize_name(node.get("name", "VMess Node")),
             "type": "vmess",
             "server": node.get("server", ""),
             "port": node.get("port", 443),
@@ -241,7 +245,7 @@ class ClashGenerator:
     def _convert_trojan(self, node: Dict) -> Dict:
         """转换Trojan节点为Clash格式"""
         clash_node = {
-            "name": self._sanitize_name(node.get("name", "Trojan Node")),
+            "name": sanitize_name(node.get("name", "Trojan Node")),
             "type": "trojan",
             "server": node.get("server", ""),
             "port": node.get("port", 443),
@@ -277,7 +281,7 @@ class ClashGenerator:
     def _convert_vless(self, node: Dict) -> Dict:
         """转换VLESS节点为Clash格式 - Shadowrocket原生支持VLESS"""
         clash_node = {
-            "name": self._sanitize_name(node.get("name", "VLESS Node")),
+            "name": sanitize_name(node.get("name", "VLESS Node")),
             "type": "vless",
             "server": node.get("server", ""),
             "port": node.get("port", 443),
@@ -335,7 +339,7 @@ class ClashGenerator:
     def _convert_hysteria2(self, node: Dict) -> Dict:
         """转换Hysteria2节点为Clash格式"""
         return {
-            "name": self._sanitize_name(node.get("name", "Hysteria2")),
+            "name": sanitize_name(node.get("name", "Hysteria2")),
             "type": "hysteria2",
             "server": node.get("server", ""),
             "port": node.get("port", 443),
@@ -349,7 +353,7 @@ class ClashGenerator:
     def _convert_tuic(self, node: Dict) -> Dict:
         """转换Tuic节点为Clash格式"""
         return {
-            "name": self._sanitize_name(node.get("name", "Tuic")),
+            "name": sanitize_name(node.get("name", "Tuic")),
             "type": "tuic",
             "server": node.get("server", ""),
             "port": node.get("port", 443),
@@ -362,7 +366,7 @@ class ClashGenerator:
     def _convert_anytls(self, node: Dict) -> Dict:
         """转换anytls节点为Clash格式"""
         return {
-            "name": self._sanitize_name(node.get("name", "anyTLS")),
+            "name": sanitize_name(node.get("name", "anyTLS")),
             "type": "anytls",
             "server": node.get("server", ""),
             "port": node.get("port", 443),
@@ -372,33 +376,7 @@ class ClashGenerator:
             "skip-cert-verify": node.get("skip-cert-verify", False),
         }
 
-    def _sanitize_name(self, name: str) -> str:
-        """清理节点名称，移除可能导致YAML解析问题的字符"""
-        # 移除或替换特殊字符
-        invalid_chars = [
-            ":",
-            "{",
-            "}",
-            "[",
-            "]",
-            ",",
-            "&",
-            "*",
-            "?",
-            "|",
-            "-",
-            "<",
-            ">",
-            "=",
-            "!",
-            "%",
-            "@",
-            "\\",
-        ]
-        sanitized = name
-        for char in invalid_chars:
-            sanitized = sanitized.replace(char, "_")
-        return sanitized[:50]  # 限制长度
+    # _sanitize_name 方法已移除，使用 utils.sanitize_name
 
     def generate_full_config(self) -> Optional[Dict]:
         """生成完整版Clash配置，优化Shadowrocket兼容性"""
@@ -589,7 +567,7 @@ class ClashGenerator:
             {
                 "name": "♻️ 自动选择",
                 "type": "url-test",
-                "url": "http://www.gstatic.com/generate_204",
+                "url": "http://www.google.com/generate_204",
                 "interval": 300,
                 "tolerance": 50,
                 "proxies": node_names[:40],
@@ -597,7 +575,7 @@ class ClashGenerator:
             {
                 "name": "🔯 故障转移",
                 "type": "fallback",
-                "url": "http://www.gstatic.com/generate_204",
+                "url": "http://www.google.com/generate_204",
                 "interval": 180,
                 "proxies": node_names[:20],
             },

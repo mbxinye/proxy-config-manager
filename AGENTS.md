@@ -17,33 +17,20 @@ uv sync
 ### Testing
 
 ```bash
-# Full strict mode test (TCP connection validation)
-./test.sh
-
-# High performance mode (multi-threaded, concurrent)
-./test_fast.sh
-
-# Using uv package manager
-./test_uv.sh
-
-# Test a single subscription link
-python3 test_single.py <url>
-
-# Run node validation only
-python3 scripts/validator.py validate
-
-# Run fast validator (high concurrency)
-python3 scripts/validator_fast.py
+# Unified entry point - use run.py for all operations
+python3 run.py                          # 本地模式 (local)
+python3 run.py ci                       # CI/自动化模式
+python3 run.py init                     # 仅初始化订阅数据库
+python3 run.py fetch                    # 仅获取订阅
+python3 run.py validate                 # 仅验证节点
 
 # Subscription management
 python3 scripts/subscription_manager.py init      # Initialize subscriptions
-python3 scripts/subscription_manager.py select    # Select subscriptions to use
-python3 scripts/subscription_manager.py fetch     # Fetch subscription content
-python3 scripts/subscription_manager.py update-scores  # Update subscription scores
+python3 scripts/subscription_manager.py select    # Select subscriptions
+python3 scripts/subscription_manager.py update-scores  # Update scores
 python3 scripts/subscription_manager.py report    # Generate report
-python3 scripts/subscription_manager.py generate-meta [max_nodes] [balance]  # Generate Clash.meta configs
 
-# Generate Clash config directly
+# Generate Clash config
 python3 scripts/clash_generator.py generate
 
 # Rename nodes by geographic location
@@ -53,15 +40,13 @@ python3 scripts/node_renamer.py [input_file] [output_file]
 ### Environment Variables
 
 ```bash
-PROXY_SUB_TIMEOUT=45      # Subscription fetch timeout (seconds)
-PROXY_TCP_TIMEOUT=8       # TCP connection test timeout (seconds)
-PROXY_DNS_TIMEOUT=5       # DNS resolution timeout (seconds)
-PROXY_HTTP_TIMEOUT=30     # HTTP request timeout (seconds)
-PROXY_BATCH_SIZE=20       # Concurrent node tests per batch
-PROXY_BATCH_DELAY=0.5     # Delay between batches (seconds)
-PROXY_MAX_LATENCY=2000    # Maximum allowed latency (ms)
-PROXY_VALIDATION_MODE=strict  # Validation mode: strict|lenient
-PROXY_MAX_OUTPUT_NODES=200   # Maximum output nodes for final config
+PROXY_SUB_TIMEOUT=30      # Subscription fetch timeout (seconds)
+PROXY_TCP_TIMEOUT=3        # TCP connection test timeout (seconds)
+PROXY_BATCH_SIZE=200       # Concurrent node tests (TCP)
+PROXY_BATCH_DELAY=0.01     # Delay between batches
+PROXY_MAX_LATENCY=2000     # Maximum allowed latency (ms)
+PROXY_MAX_OUTPUT_NODES=100 # Maximum output nodes
+PROXY_CLASH_TEST_LIMIT=100 # Clash test node limit
 ```
 
 ## Code Style Guidelines

@@ -93,74 +93,11 @@ jobs:
         
         echo "✓ 数据下载完成"
 
-    - name: Initialize subscriptions
-      run: |
-        echo "📦 初始化订阅数据库..."
-        python scripts/subscription_manager.py init
-    
-    - name: Select subscriptions
-      id: select
-      run: |
-        echo "🎯 智能选择订阅..."
-        SELECTED=$(python scripts/subscription_manager.py select)
-        echo "selected_count=$(echo $SELECTED | jq '. | length')" >> $GITHUB_OUTPUT
-        echo "Selected subscriptions: $SELECTED"
-    
-    - name: Fetch subscriptions (Parallel)
-      run: |
-        echo "📥 并行获取订阅（多线程）..."
-        python scripts/subscription_manager_fast.py
-    
-    - name: Validate nodes (TCP Test)
-      id: validate
-      run: |
-        echo "🔍 第一阶段：TCP连通性测试..."
-        python scripts/validator_fast.py
-
-        # 读取统计
-        if [ -f output/validation_stats.json ]; then
-          echo "total_nodes=$(cat output/validation_stats.json | jq '.total_nodes')" >> $GITHUB_OUTPUT
-        fi
-
-    - name: Install Clash for real testing
-      run: |
-        echo "🔧 安装Clash内核..."
-        # 下载Clash.Meta (mihomo)
-        CLASH_VERSION="v1.18.10"
-        curl -sL "https://github.com/MetaCubeX/mihomo/releases/download/${CLASH_VERSION}/mihomo-linux-amd64-${CLASH_VERSION}.gz" -o clash.gz
-        gunzip clash.gz
-        chmod +x clash
-        sudo mv clash /usr/local/bin/clash
-        echo "✓ Clash安装完成"
-        clash -v
-
-    - name: Test nodes with Clash (Real Proxy Test)
-      id: clash_test
-      run: |
-        echo "🧪 第二阶段：Clash真实代理测试..."
-        python scripts/clash_tester.py
-
-        # 读取Clash测试结果
-        if [ -f output/clash_test_results.json ]; then
-          echo "valid_nodes=$(cat output/clash_test_results.json | jq '.valid_nodes')" >> $GITHUB_OUTPUT
-          echo "success_rate=$(cat output/clash_test_results.json | jq -r '.success_rate * 100 | round')" >> $GITHUB_OUTPUT
-        fi
-    
-    - name: Update subscription scores
-      run: |
-        echo "📊 更新订阅评分..."
-        python scripts/subscription_manager.py update-scores
-    
-    - name: Generate Clash configuration
-      run: |
-        echo "📝 生成Clash配置（支持Hysteria2/Tuic/anytls等协议）..."
-        python scripts/clash_generator.py generate
-    
-    - name: Generate report
-      run: |
-        echo "📄 生成报告..."
-        python scripts/subscription_manager.py report > output/report.md
-        cat output/report.md
+    - name: Run full pipeline
+      run: python3 run.py ci
+      env:
+        PROXY_BATCH_SIZE: 100
+        PROXY_BATCH_DELAY: 0.1
     
     - name: Prepare GitHub Pages
       run: |
@@ -306,12 +243,30 @@ jobs:
       run: |
         echo "## 🚀 高性能代理配置更新完成" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
+        
+        # 读取统计信息
+        if [ -f output/selected.json ]; then
+          sub_count=$(jq '. | length' output/selected.json)
+        else
+          sub_count="?"
+        fi
+        
+        if [ -f output/validation_stats.json ]; then
+          total=$(jq '.total_nodes' output/validation_stats.json)
+          valid=$(jq '.valid_nodes' output/validation_stats.json)
+          rate=$(jq '(.valid_nodes / max(.total_nodes,1) * 100 | floor)' output/validation_stats.json)
+        else
+          total="?"
+          valid="?"
+          rate="?"
+        fi
+        
         echo "| 指标 | 数值 |" >> $GITHUB_STEP_SUMMARY
         echo "|------|------|" >> $GITHUB_STEP_SUMMARY
-        echo "| 📊 处理订阅 | ${{ steps.select.outputs.selected_count }} 个 |" >> $GITHUB_STEP_SUMMARY
-        echo "| 🌐 总节点 | ${{ steps.validate.outputs.total_nodes }} |" >> $GITHUB_STEP_SUMMARY
-        echo "| ✅ 有效节点 | ${{ steps.validate.outputs.valid_nodes }} |" >> $GITHUB_STEP_SUMMARY
-        echo "| 📈 有效率 | ${{ steps.validate.outputs.success_rate }}% |" >> $GITHUB_STEP_SUMMARY
+        echo "| 📊 处理订阅 | ${sub_count} 个 |" >> $GITHUB_STEP_SUMMARY
+        echo "| 🌐 总节点 | ${total} |" >> $GITHUB_STEP_SUMMARY
+        echo "| ✅ 有效节点 | ${valid} |" >> $GITHUB_STEP_SUMMARY
+        echo "| 📈 有效率 | ${rate}% |" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### 📥 配置文件下载" >> $GITHUB_STEP_SUMMARY
         echo "- 完整配置: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/clash.yml" >> $GITHUB_STEP_SUMMARY
@@ -319,5 +274,5 @@ jobs:
         echo "- Shadowrocket: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/shadowrocket_full.txt" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### ⚡ 性能模式" >> $GITHUB_STEP_SUMMARY
-        echo "- 订阅获取: 10线程并行" >> $GITHUB_STEP_SUMMARY
-        echo "- 节点验证: 100并发测试" >> $GITHUB_STEP_SUMMARY
+        echo "- 订阅获取: 多线程并行" >> $GITHUB_STEP_SUMMARY
+        echo "- 节点验证: 高并发测试" >> $GITHUB_STEP_SUMMARY

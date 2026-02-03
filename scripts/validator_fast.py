@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-高性能节点验证器 - TCP + Clash 双阶段验证
-阶段1: TCP端口连接测试（快速过滤）
-阶段2: Clash内核延迟测试（真实代理功能）
+高性能节点验证器 - 优化版
+阶段1: TCP端口连接测试（快速过滤，带DNS缓存）
+阶段2: Clash内核延迟测试（批量测试）
 """
 
 import asyncio
@@ -14,6 +14,7 @@ import subprocess
 import sys
 import time
 import urllib.parse
+from functools import lru_cache
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
@@ -21,13 +22,11 @@ import aiohttp
 import yaml
 
 from config import Config
+from utils import sanitize_name
 
 
 def _is_valid_reality_short_id(short_id: str) -> bool:
-    """验证 REALITY short ID 格式（必须为有效的十六进制字符串）"""
-    if not short_id:
-        return False
-    if len(short_id) < 2 or len(short_id) > 16:
+    if not short_id or len(short_id) < 2 or len(short_id) > 16:
         return False
     try:
         int(short_id, 16)
@@ -36,10 +35,21 @@ def _is_valid_reality_short_id(short_id: str) -> bool:
         return False
 
 
+@lru_cache(maxsize=1024)
+def _dns_resolve_cached(host: str) -> Optional[str]:
+    try:
+        infos = socket.getaddrinfo(host, None, socket.AF_INET, socket.SOCK_STREAM)
+        if infos:
+            return str(infos[0][4][0])
+    except Exception:
+        pass
+    return None
+
+
 class HighPerformanceValidator:
     """高性能验证器 - 使用高并发"""
 
-    HTTP_TEST_URL = "http://www.google.com/generate_204"
+    CLASH_TEST_URL = "http://www.google.com/generate_204"
 
     def __init__(self, verbose: bool = True, max_concurrent: int = 100):
         self.output_dir = Path("output")
@@ -61,7 +71,7 @@ class HighPerformanceValidator:
         self.clash_api_host = "127.0.0.1"
         self.clash_api_port = 9091
         self.clash_process: Optional[subprocess.Popen] = None
-        self.clash_test_url = "http://www.gstatic.com/generate_204"
+        self.clash_test_url = self.CLASH_TEST_URL
         self.clash_test_timeout = 5000
 
     def log(self, message: str):
@@ -96,7 +106,7 @@ class HighPerformanceValidator:
             decoded = base64.b64decode(content).decode("utf-8", errors="ignore")
             if decoded and len(decoded) > len(content) / 2:
                 content = decoded
-        except:
+        except Exception:
             pass
 
         # 检测内容类型
@@ -225,7 +235,7 @@ class HighPerformanceValidator:
                 return self.parse_trojan(line)
             elif line.startswith("vless://"):
                 return self.parse_vless(line)
-        except:
+        except Exception:
             pass
         return None
 
@@ -263,7 +273,7 @@ class HighPerformanceValidator:
                 "cipher": method,
                 "raw": url,
             }
-        except:
+        except Exception:
             return None
 
     def parse_vmess(self, url: str) -> Optional[Dict]:
@@ -329,41 +339,10 @@ class HighPerformanceValidator:
         except:
             return None
 
-    def _sanitize_name(self, name: str) -> str:
-        """清理节点名称，移除所有非ASCII字符"""
-        sanitized = name.encode("ascii", "ignore").decode("ascii")
-        invalid_chars = [
-            ":",
-            "{",
-            "}",
-            "[",
-            "]",
-            ",",
-            "&",
-            "*",
-            "?",
-            "|",
-            "-",
-            "<",
-            ">",
-            "=",
-            "!",
-            "%",
-            "@",
-            "\\",
-            "/",
-            " ",
-            "'",
-            '"',
-        ]
-        for char in invalid_chars:
-            sanitized = sanitized.replace(char, "_")
-        return sanitized[:50] or "Node"
-
     def node_to_clash(self, node: Dict) -> Optional[Dict]:
         """将节点转换为Clash格式"""
         node_type = node.get("type", "")
-        name = self._sanitize_name(node.get("name", f"{node_type}_node"))
+        name = sanitize_name(node.get("name", f"{node_type}_node"))
 
         if node_type == "ss":
             return {
@@ -602,7 +581,7 @@ class HighPerformanceValidator:
                                 f"  ✓ Clash API就绪 (版本: {data.get('version', 'unknown')})"
                             )
                             return True
-            except:
+            except Exception:
                 await asyncio.sleep(0.5)
         self.log("  ⚠️ Clash API未就绪")
         return False
@@ -681,31 +660,22 @@ class HighPerformanceValidator:
     async def test_all_clash_proxies(
         self, proxies: List[Dict], tcp_passed_nodes: List[Dict]
     ) -> List[Dict]:
-        """测试所有通过TCP的代理（使用Clash API）"""
+        """测试所有通过TCP的代理（使用Clash API，批量并发）"""
         if not proxies:
             return tcp_passed_nodes
 
-        self.log(f"\n📡 阶段2: Clash真实代理测试 ({len(proxies)} 个节点)...")
-
-        semaphore = asyncio.Semaphore(20)
-        name_to_node = {
-            self._sanitize_name(n.get("name", "")): n for n in tcp_passed_nodes
-        }
+        semaphore = asyncio.Semaphore(50)
+        name_to_node = {sanitize_name(n.get("name", "")): n for n in tcp_passed_nodes}
 
         async def test_proxy(proxy: Dict, index: int):
             async with semaphore:
                 name = proxy["name"]
                 delay, status = await self.test_clash_proxy_delay(name)
-
-                if self.verbose and (index + 1) % 50 == 0:
-                    self.log(f"    进度: {index + 1}/{len(proxies)}")
-
                 return {
                     "name": name,
                     "type": proxy["type"],
                     "delay": delay,
                     "status": status,
-                    "index": index,
                 }
 
         tasks = [test_proxy(proxy, i) for i, proxy in enumerate(proxies)]
@@ -713,7 +683,6 @@ class HighPerformanceValidator:
 
         valid_nodes = []
         clash_passed = 0
-        clash_failed = 0
 
         for result in results:
             original_node = name_to_node.get(result["name"])
@@ -723,36 +692,27 @@ class HighPerformanceValidator:
                 valid_nodes.append(original_node)
                 clash_passed += 1
             else:
-                clash_failed += 1
                 reason = result.get("status", "unknown")
                 self.clash_failed_reasons[reason] = (
                     self.clash_failed_reasons.get(reason, 0) + 1
                 )
 
-        self.log(f"  ✓ Clash通过: {clash_passed} 个节点")
-        self.log(f"  ✗ Clash失败: {clash_failed} 个节点")
-
+        self.log(f"  ✓ Clash通过: {clash_passed}/{len(proxies)} 个节点")
         return valid_nodes
 
     async def test_tcp_connect_semaphore(
         self, host: str, port: int, semaphore: asyncio.Semaphore
     ) -> Tuple[bool, float, str]:
-        """测试TCP连接（带信号量控制并发）"""
+        """测试TCP连接（带DNS缓存和信号量控制）"""
         async with semaphore:
             try:
-                # DNS解析
-                try:
-                    await asyncio.wait_for(
-                        asyncio.get_event_loop().getaddrinfo(host, None),
-                        timeout=Config.DNS_TIMEOUT,
-                    )
-                except:
+                ip = _dns_resolve_cached(host)
+                if not ip:
                     return False, float("inf"), "DNS解析失败"
 
-                # TCP连接
                 start_time = time.time()
                 reader, writer = await asyncio.wait_for(
-                    asyncio.open_connection(host, port), timeout=self.timeout
+                    asyncio.open_connection(ip, port), timeout=self.timeout
                 )
                 latency = (time.time() - start_time) * 1000
 
@@ -766,8 +726,8 @@ class HighPerformanceValidator:
 
             except asyncio.TimeoutError:
                 return False, float("inf"), "TCP连接超时"
-            except Exception as e:
-                return False, float("inf"), f"错误"
+            except Exception:
+                return False, float("inf"), f"连接失败"
 
     async def validate_node_tcp(self, node: Dict) -> Tuple[bool, float, str]:
         """测试节点TCP连接"""
@@ -974,13 +934,13 @@ class HighPerformanceValidator:
             "valid_nodes": len(valid_nodes),
             "tcp_passed": len(tcp_passed_nodes),
             "tcp_failed": tcp_failed_count,
-            "clash_passed": clash_passed if "clash_passed" in dir() else 0,
-            "clash_failed": clash_failed if "clash_failed" in dir() else 0,
+            "clash_passed": clash_passed,
+            "clash_failed": clash_failed,
             "clash_filtered": self.filtered_for_clash,
             "tcp_clash_success_rate": len(valid_nodes) / max(len(unique_nodes), 1),
             "tcp_success_rate": len(tcp_passed_nodes) / max(len(unique_nodes), 1),
             "clash_success_rate": clash_passed / max(len(tcp_passed_nodes), 1)
-            if "clash_passed" in dir() and tcp_passed_nodes
+            if tcp_passed_nodes
             else 0,
             "elapsed_time": total_elapsed,
             "tcp_elapsed": tcp_elapsed,
@@ -1048,8 +1008,10 @@ class HighPerformanceValidator:
 
 
 def run_validator():
-    """运行验证器并确保正确清理"""
-    validator = HighPerformanceValidator(max_concurrent=100)
+    """运行验证器"""
+    validator = HighPerformanceValidator(
+        max_concurrent=Config.VALIDATION_BATCH_SIZE, verbose=True
+    )
 
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
@@ -1057,15 +1019,13 @@ def run_validator():
     try:
         loop.run_until_complete(validator.validate_all_fast())
     except KeyboardInterrupt:
-        print("\n\n⚠️  用户中断，正在清理...")
+        print("\n⚠️  用户中断")
     finally:
         pending = asyncio.all_tasks(loop)
         for task in pending:
             task.cancel()
-
         if pending:
             loop.run_until_complete(asyncio.gather(*pending, return_exceptions=True))
-
         loop.close()
 
 
