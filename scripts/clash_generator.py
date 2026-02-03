@@ -443,7 +443,6 @@ class ClashGenerator:
             "tcp-concurrent": True,
             "enable-process": True,
             "find-process-mode": "strict",
-            "global-client-fingerprint": "chrome",
             "profile": {
                 "store-selected": True,
                 "store-fake-ip": True,
@@ -581,6 +580,11 @@ class ClashGenerator:
                 "name": "🚀 节点选择",
                 "type": "select",
                 "proxies": ["♻️ 自动选择", "🔯 故障转移", "DIRECT"] + node_names[:30],
+            },
+            {
+                "name": "🎯 全球直连",
+                "type": "select",
+                "proxies": ["DIRECT", "🚀 节点选择"],
             },
             {
                 "name": "♻️ 自动选择",
