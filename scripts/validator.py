@@ -579,20 +579,16 @@ class NodeValidator:
                     )
                 else:
                     self.failed_reasons[reason] = self.failed_reasons.get(reason, 0) + 1
-                    # 只显示前5个失败详情
                     if len(self.failed_reasons) <= 5 and i < 5:
                         self.log(
                             f"❌ {node['name'][:35]:<35} [{node['type']:6}] - {reason}"
                         )
 
-                await asyncio.sleep(0.02)
-
-            # 进度显示
             progress = min((i + batch_size) / len(unique_nodes) * 100, 100)
             if i % 100 == 0:
                 print(f"   进度: {progress:.0f}% ({i}/{len(unique_nodes)})")
 
-            await asyncio.sleep(self.batch_delay)
+            await asyncio.sleep(0.02)
 
         # 按延迟排序
         valid_nodes.sort(key=lambda x: x.get("latency", 9999))

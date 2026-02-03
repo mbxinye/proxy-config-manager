@@ -36,6 +36,8 @@ class HighPerformanceValidator:
         self.failed_reasons: Dict[str, int] = {}
         self.http_failed_reasons: Dict[str, int] = {}
         self.subscription_scores: Dict[str, int] = self._load_subscription_scores()
+        self._session: Optional[aiohttp.ClientSession] = None
+        self._connector: Optional[aiohttp.TCPConnector] = None
 
     def log(self, message: str):
         """打印日志"""
@@ -362,6 +364,21 @@ class HighPerformanceValidator:
         except Exception:
             return None
 
+    def _get_session(self) -> aiohttp.ClientSession:
+        """获取或创建复用的 aiohttp session"""
+        if self._session is None or self._session.closed:
+            self._connector = aiohttp.TCPConnector(
+                ssl=False,
+                limit=200,
+                ttl_dns_cache=300,
+                keepalive_timeout=30,
+            )
+            self._session = aiohttp.ClientSession(
+                connector=self._connector,
+                timeout=aiohttp.ClientTimeout(total=self.http_timeout),
+            )
+        return self._session
+
     async def test_http_connectivity(
         self, node: Dict, semaphore: asyncio.Semaphore
     ) -> Tuple[bool, float, str]:
@@ -373,36 +390,28 @@ class HighPerformanceValidator:
         async with semaphore:
             try:
                 start_time = time.time()
+                session = self._get_session()
 
-                timeout = aiohttp.ClientTimeout(total=self.http_timeout)
-                connector = aiohttp.TCPConnector(ssl=False)
+                async with session.get(
+                    self.HTTP_TEST_URL, proxy=proxy_url, allow_redirects=True
+                ) as response:
+                    latency = (time.time() - start_time) * 1000
 
-                async with aiohttp.ClientSession(
-                    timeout=timeout, connector=connector
-                ) as session:
-                    try:
-                        async with session.get(
-                            self.HTTP_TEST_URL, proxy=proxy_url, allow_redirects=True
-                        ) as response:
-                            latency = (time.time() - start_time) * 1000
+                    if response.status in (204, 200, 301, 302):
+                        return True, latency, "HTTP连接成功"
+                    else:
+                        return False, latency, f"HTTP: 状态码 {response.status}"
 
-                            if response.status in (204, 200, 301, 302):
-                                return True, latency, "HTTP连接成功"
-                            else:
-                                return False, latency, f"HTTP: 状态码 {response.status}"
-                    except aiohttp.ClientProxyConnectionError:
-                        return False, float("inf"), "HTTP: 代理连接失败"
-                    except aiohttp.ClientHttpProxyError as e:
-                        return False, float("inf"), f"HTTP: 代理错误 {e.status}"
-                    except aiohttp.ClientConnectorError:
-                        return False, float("inf"), "HTTP: 连接失败"
-                    except asyncio.TimeoutError:
-                        return False, float("inf"), "HTTP: 请求超时"
-                    except aiohttp.ClientError as e:
-                        return False, float("inf"), f"HTTP: 客户端错误 {str(e)[:30]}"
-
+            except aiohttp.ClientProxyConnectionError:
+                return False, float("inf"), "HTTP: 代理连接失败"
+            except aiohttp.ClientHttpProxyError as e:
+                return False, float("inf"), f"HTTP: 代理错误 {e.status}"
+            except aiohttp.ClientConnectorError:
+                return False, float("inf"), "HTTP: 连接失败"
             except asyncio.TimeoutError:
-                return False, float("inf"), "HTTP: 会话超时"
+                return False, float("inf"), "HTTP: 请求超时"
+            except aiohttp.ClientError as e:
+                return False, float("inf"), f"HTTP: 客户端错误 {str(e)[:30]}"
             except Exception as e:
                 return False, float("inf"), f"HTTP: 错误 {str(e)[:30]}"
 
@@ -606,16 +615,24 @@ class HighPerformanceValidator:
                     f"  {i:2}. {node['name'][:40]} [{node['type']}] HTTP:{latency:.1f}ms (TCP:{tcp_latency:.1f}ms)"
                 )
 
-        print(f"\n{'=' * 70}")
-        print("✅ 验证结束")
-        print(f"{'=' * 70}\n")
+            print(f"\n{'=' * 70}")
+            print("✅ 验证结束")
+            print(f"{'=' * 70}\n")
+
+    async def close(self):
+        """关闭 session"""
+        if self._session and not self._session.closed:
+            await self._session.close()
+            self._session = None
+        if self._connector:
+            self._connector.close()
+            self._connector = None
 
 
 def run_validator():
     """运行验证器并确保正确清理"""
     validator = HighPerformanceValidator(max_concurrent=100)
 
-    # 手动创建和管理事件循环
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
 
@@ -624,16 +641,14 @@ def run_validator():
     except KeyboardInterrupt:
         print("\n\n⚠️  用户中断，正在清理...")
     finally:
-        # 取消所有待处理的任务
         pending = asyncio.all_tasks(loop)
         for task in pending:
             task.cancel()
 
-        # 等待任务取消完成
         if pending:
             loop.run_until_complete(asyncio.gather(*pending, return_exceptions=True))
 
-        # 关闭事件循环
+        loop.run_until_complete(validator.close())
         loop.close()
 
 

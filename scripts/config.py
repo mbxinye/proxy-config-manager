@@ -17,23 +17,23 @@ class Config:
 
     # TCP连接测试超时（秒）
     # 代理节点响应通常较慢，但不能太长
-    TCP_CONNECT_TIMEOUT = int(os.getenv("PROXY_TCP_TIMEOUT", "8"))  # 默认8秒
+    TCP_CONNECT_TIMEOUT = int(os.getenv("PROXY_TCP_TIMEOUT", "5"))  # 默认5秒
 
     # DNS解析超时（秒）
     # DNS解析应该很快
-    DNS_TIMEOUT = int(os.getenv("PROXY_DNS_TIMEOUT", "5"))  # 默认5秒
+    DNS_TIMEOUT = int(os.getenv("PROXY_DNS_TIMEOUT", "3"))  # 默认3秒
 
     # HTTP请求超时（秒）
     # 用于单链接测试等场景
-    HTTP_TIMEOUT = int(os.getenv("PROXY_HTTP_TIMEOUT", "30"))  # 默认30秒
+    HTTP_TIMEOUT = int(os.getenv("PROXY_HTTP_TIMEOUT", "15"))  # 默认15秒
 
     # 批次大小（并发数）
     # 控制同时测试的节点数量，避免被封
-    VALIDATION_BATCH_SIZE = int(os.getenv("PROXY_BATCH_SIZE", "20"))  # 默认20个/批
+    VALIDATION_BATCH_SIZE = int(os.getenv("PROXY_BATCH_SIZE", "100"))  # 默认100个/批
 
     # 批次间延迟（秒）
     # 避免请求过快被封
-    BATCH_DELAY = float(os.getenv("PROXY_BATCH_DELAY", "0.5"))  # 默认0.5秒
+    BATCH_DELAY = float(os.getenv("PROXY_BATCH_DELAY", "0.05"))  # 默认0.05秒
 
     # 最大延迟阈值（毫秒）
     # 超过此延迟的节点会被过滤

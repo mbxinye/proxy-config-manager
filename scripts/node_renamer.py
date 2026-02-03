@@ -338,7 +338,7 @@ class NodeRenamer:
         if ip_tasks:
             print(f"查询 {len(ip_tasks)} 个IP的地理位置...")
 
-            semaphore = asyncio.Semaphore(20)
+            semaphore = asyncio.Semaphore(50)
 
             async def query_with_semaphore(ip: str):
                 async with semaphore:
@@ -369,8 +369,6 @@ class NodeRenamer:
                         print(f"  ⚠️  未知国家代码: {country_code}")
                 else:
                     print(f"  ⚠️  无法查询 {ip} 的位置")
-
-                await asyncio.sleep(0.1)
 
         self.save_cache()
 

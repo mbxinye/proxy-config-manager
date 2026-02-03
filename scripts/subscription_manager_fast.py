@@ -106,7 +106,7 @@ class HighPerformanceSubscriptionManager:
                 "success": False,
             }
 
-    def fetch_subscriptions_parallel(self, max_workers: int = 10):
+    def fetch_subscriptions_parallel(self, max_workers: int = 20):
         """并行获取所有订阅（多线程）"""
         urls_file = self.output_dir / "urls_to_fetch.txt"
         if not urls_file.exists():
