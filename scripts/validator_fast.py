@@ -330,7 +330,8 @@ class HighPerformanceValidator:
             return None
 
     def _sanitize_name(self, name: str) -> str:
-        """清理节点名称"""
+        """清理节点名称，移除所有非ASCII字符"""
+        sanitized = name.encode("ascii", "ignore").decode("ascii")
         invalid_chars = [
             ":",
             "{",
@@ -350,11 +351,14 @@ class HighPerformanceValidator:
             "%",
             "@",
             "\\",
+            "/",
+            " ",
+            "'",
+            '"',
         ]
-        sanitized = name
         for char in invalid_chars:
             sanitized = sanitized.replace(char, "_")
-        return sanitized[:50]
+        return sanitized[:50] or "Node"
 
     def node_to_clash(self, node: Dict) -> Optional[Dict]:
         """将节点转换为Clash格式"""
@@ -480,6 +484,24 @@ class HighPerformanceValidator:
             self.log("  ⚠️ 没有可转换的节点")
             return False, 0, filtered_count
 
+        # 名称去重：确保所有节点名称唯一
+        seen_names = set()
+        unique_clash_nodes = []
+        for i, cn in enumerate(clash_nodes):
+            original_name = cn["name"]
+            name = original_name
+            counter = 1
+            while name in seen_names:
+                name = f"{original_name}_{counter}"
+                counter += 1
+            seen_names.add(name)
+            cn["name"] = name
+            unique_clash_nodes.append(cn)
+
+        if len(unique_clash_nodes) < len(clash_nodes):
+            duplicate_count = len(clash_nodes) - len(unique_clash_nodes)
+            self.log(f"  ⚠️ 过滤了 {duplicate_count} 个重复名称节点")
+
         if filtered_count > 0:
             self.log(f"  ⚠️ 过滤了 {filtered_count} 个无效节点 (REALITY配置不完整等)")
 
@@ -493,12 +515,13 @@ class HighPerformanceValidator:
             "log-level": "error",
             "ipv6": True,
             "external-controller": f"{self.clash_api_host}:{self.clash_api_port}",
-            "proxies": clash_nodes,
+            "proxies": unique_clash_nodes,
             "proxy-groups": [
                 {
                     "name": "TEST",
                     "type": "select",
-                    "proxies": ["DIRECT"] + [n["name"] for n in clash_nodes[:50]],
+                    "proxies": ["DIRECT"]
+                    + [n["name"] for n in unique_clash_nodes[:50]],
                 }
             ],
             "rules": ["MATCH,DIRECT"],
@@ -535,7 +558,16 @@ class HighPerformanceValidator:
             time.sleep(2)
 
             if self.clash_process.poll() is not None:
+                stdout, stderr = self.clash_process.communicate(timeout=5)
                 self.log("  ⚠️ Clash启动失败")
+                if stdout:
+                    self.log(
+                        f"  Stdout: {stdout.decode('utf-8', errors='ignore')[:500]}"
+                    )
+                if stderr:
+                    self.log(
+                        f"  Stderr: {stderr.decode('utf-8', errors='ignore')[:500]}"
+                    )
                 return False
 
             self.log("  ✓ Clash启动成功")
@@ -587,20 +619,29 @@ class HighPerformanceValidator:
                         data = await response.json()
                         proxies = data.get("proxies", {})
                         node_proxies = []
+                        valid_types = {
+                            "Shadowsocks",
+                            "ss",
+                            "Vmess",
+                            "vmess",
+                            "Trojan",
+                            "trojan",
+                            "Vless",
+                            "vless",
+                            "Ssr",
+                            "ssr",
+                            "Hysteria2",
+                            "hysteria2",
+                            "Tuic",
+                            "tuic",
+                        }
                         for name, info in proxies.items():
-                            if info.get("type") in [
-                                "ss",
-                                "vmess",
-                                "trojan",
-                                "vless",
-                                "ssr",
-                                "hysteria2",
-                                "tuic",
-                            ]:
+                            p_type = info.get("type", "")
+                            if p_type in valid_types:
                                 node_proxies.append(
                                     {
                                         "name": name,
-                                        "type": info.get("type"),
+                                        "type": p_type.lower(),
                                     }
                                 )
                         return node_proxies

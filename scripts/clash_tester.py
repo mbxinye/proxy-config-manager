@@ -408,7 +408,8 @@ class ClashTester:
         return clash_node
 
     def _sanitize_name(self, name: str) -> str:
-        """清理节点名称"""
+        """清理节点名称，移除所有非ASCII字符"""
+        sanitized = name.encode("ascii", "ignore").decode("ascii")
         invalid_chars = [
             ":",
             "{",
@@ -428,11 +429,14 @@ class ClashTester:
             "%",
             "@",
             "\\",
+            "/",
+            " ",
+            "'",
+            '"',
         ]
-        sanitized = name
         for char in invalid_chars:
             sanitized = sanitized.replace(char, "_")
-        return sanitized[:50]
+        return sanitized[:50] or "Node"
 
     def generate_test_config(self, nodes: List[Dict]) -> bool:
         """生成用于测试的Clash配置"""
@@ -446,6 +450,20 @@ class ClashTester:
             self.log("❌ 没有可转换的节点")
             return False
 
+        # 名称去重
+        seen_names = set()
+        unique_clash_nodes = []
+        for cn in clash_nodes:
+            original_name = cn["name"]
+            name = original_name
+            counter = 1
+            while name in seen_names:
+                name = f"{original_name}_{counter}"
+                counter += 1
+            seen_names.add(name)
+            cn["name"] = name
+            unique_clash_nodes.append(cn)
+
         config = {
             "mixed-port": 7890,
             "socks-port": 7891,
@@ -456,12 +474,13 @@ class ClashTester:
             "log-level": "error",
             "ipv6": True,
             "external-controller": f"{self.CLASH_API_HOST}:{self.CLASH_API_PORT}",
-            "proxies": clash_nodes,
+            "proxies": unique_clash_nodes,
             "proxy-groups": [
                 {
                     "name": "GLOBAL",
                     "type": "select",
-                    "proxies": ["DIRECT"] + [n["name"] for n in clash_nodes[:50]],
+                    "proxies": ["DIRECT"]
+                    + [n["name"] for n in unique_clash_nodes[:50]],
                 }
             ],
             "rules": ["MATCH,DIRECT"],
