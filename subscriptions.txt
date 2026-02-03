@@ -28,3 +28,5 @@ https://gh-proxy.com/raw.githubusercontent.com/Barabama/FreeNodes/main/nodes/wen
 https://raw.githubusercontent.com/asgharkapk/Sub-Config-Extractor/refs/heads/main/output_configs/clash/10ium/HiN-VPN/subscription/hiddify/vless.yaml
 https://raw.githubusercontent.com/asgharkapk/Sub-Config-Extractor/refs/heads/main/output_configs/clash/Surfboardv2ray/TGParse/splitted/vless.yaml
 https://raw.githubusercontent.com/asgharkapk/Sub-Config-Extractor/refs/heads/main/output_configs/clash/MatinGhanbari/v2ray-configs/vless.txt.yaml
+https://gh-proxy.com/raw.githubusercontent.com/a2470982985/getNode/main/clash.yaml
+https://gh-proxy.com/raw.githubusercontent.com/ts-sf/fly/main/clash
