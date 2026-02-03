@@ -10,8 +10,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
 # 设置并发配置
-export PROXY_BATCH_SIZE=100
-export PROXY_BATCH_DELAY=0.1
+export PROXY_BATCH_SIZE=200
+export PROXY_BATCH_DELAY=0.02
 
 # 创建必要的目录
 mkdir -p output subscriptions data
@@ -51,7 +51,7 @@ python3 scripts/subscription_manager_fast.py
 
 echo ""
 echo "======================================================================"
-echo "步骤 4/5: 高并发验证节点"
+echo "步骤 4/5: 双阶段验证节点 (TCP + Clash)"
 echo "======================================================================"
 python3 scripts/validator_fast.py
 

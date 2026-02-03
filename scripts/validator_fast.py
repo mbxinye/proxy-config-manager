@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-高性能节点验证器 - 高并发版本
-使用更大的并发度和优化策略
+高性能节点验证器 - TCP + Clash 双阶段验证
+阶段1: TCP端口连接测试（快速过滤）
+阶段2: Clash内核延迟测试（真实代理功能）
 """
 
 import asyncio
@@ -9,6 +10,7 @@ import base64
 import json
 import socket
 import ssl
+import subprocess
 import sys
 import time
 import urllib.parse
@@ -16,6 +18,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
 import aiohttp
+import yaml
 
 from config import Config
 
@@ -34,10 +37,18 @@ class HighPerformanceValidator:
         self.verbose = verbose
         self.max_concurrent = max_concurrent
         self.failed_reasons: Dict[str, int] = {}
-        self.http_failed_reasons: Dict[str, int] = {}
+        self.clash_failed_reasons: Dict[str, int] = {}
         self.subscription_scores: Dict[str, int] = self._load_subscription_scores()
         self._session: Optional[aiohttp.ClientSession] = None
         self._connector: Optional[aiohttp.TCPConnector] = None
+
+        self.clash_binary = Path("/usr/local/bin/clash")
+        self.clash_config_file = self.output_dir / "clash_validator_config.yml"
+        self.clash_api_host = "127.0.0.1"
+        self.clash_api_port = 9091
+        self.clash_process: Optional[subprocess.Popen] = None
+        self.clash_test_url = "http://www.gstatic.com/generate_204"
+        self.clash_test_timeout = 5000
 
     def log(self, message: str):
         """打印日志"""
@@ -283,6 +294,7 @@ class HighPerformanceValidator:
             return None
 
     def parse_vless(self, url: str) -> Optional[Dict]:
+        """解析VLESS URI"""
         try:
             parsed = urllib.parse.urlparse(url)
             server = parsed.hostname
@@ -302,6 +314,342 @@ class HighPerformanceValidator:
             }
         except:
             return None
+
+    def _sanitize_name(self, name: str) -> str:
+        """清理节点名称"""
+        invalid_chars = [
+            ":",
+            "{",
+            "}",
+            "[",
+            "]",
+            ",",
+            "&",
+            "*",
+            "?",
+            "|",
+            "-",
+            "<",
+            ">",
+            "=",
+            "!",
+            "%",
+            "@",
+            "\\",
+        ]
+        sanitized = name
+        for char in invalid_chars:
+            sanitized = sanitized.replace(char, "_")
+        return sanitized[:50]
+
+    def node_to_clash(self, node: Dict) -> Optional[Dict]:
+        """将节点转换为Clash格式"""
+        node_type = node.get("type", "")
+        name = self._sanitize_name(node.get("name", f"{node_type}_node"))
+
+        if node_type == "ss":
+            return {
+                "name": name,
+                "type": "ss",
+                "server": node.get("server", ""),
+                "port": node.get("port", 0),
+                "password": node.get("password", ""),
+                "cipher": node.get("cipher", "aes-256-gcm"),
+                "udp": True,
+            }
+        elif node_type == "vmess":
+            return {
+                "name": name,
+                "type": "vmess",
+                "server": node.get("server", ""),
+                "port": node.get("port", 443),
+                "uuid": node.get("uuid", ""),
+                "alterId": node.get("alterId", 0),
+                "cipher": node.get("security", "auto"),
+                "udp": True,
+            }
+        elif node_type == "trojan":
+            clash_node = {
+                "name": name,
+                "type": "trojan",
+                "server": node.get("server", ""),
+                "port": node.get("port", 443),
+                "password": node.get("password", ""),
+                "udp": True,
+                "skip-cert-verify": False,
+            }
+            if node.get("sni"):
+                clash_node["sni"] = node["sni"]
+            return clash_node
+        elif node_type == "vless":
+            clash_node = {
+                "name": name,
+                "type": "vless",
+                "server": node.get("server", ""),
+                "port": node.get("port", 443),
+                "uuid": node.get("uuid", ""),
+                "udp": True,
+                "skip-cert-verify": False,
+            }
+            if node.get("flow"):
+                clash_node["flow"] = node["flow"]
+            return clash_node
+        elif node_type == "ssr":
+            return {
+                "name": name,
+                "type": "ssr",
+                "server": node.get("server", ""),
+                "port": node.get("port", 0),
+                "password": node.get("password", ""),
+                "cipher": node.get("cipher", "aes-256-cfb"),
+                "protocol": node.get("protocol", "origin"),
+                "obfs": node.get("obfs", "plain"),
+                "udp": True,
+            }
+        elif node_type == "hysteria2":
+            return {
+                "name": name,
+                "type": "hysteria2",
+                "server": node.get("server", ""),
+                "port": node.get("port", 0),
+                "password": node.get("password", ""),
+                "up": node.get("up", 100),
+                "down": node.get("down", 100),
+                "sni": node.get("sni"),
+            }
+        elif node_type == "tuic":
+            return {
+                "name": name,
+                "type": "tuic",
+                "server": node.get("server", ""),
+                "port": node.get("port", 0),
+                "uuid": node.get("uuid", ""),
+                "password": node.get("password", ""),
+                "sni": node.get("sni"),
+            }
+        return None
+
+    def generate_clash_config(self, nodes: List[Dict]) -> bool:
+        """生成用于测试的Clash配置"""
+        clash_nodes = []
+        for node in nodes:
+            clash_node = self.node_to_clash(node)
+            if clash_node:
+                clash_nodes.append(clash_node)
+
+        if not clash_nodes:
+            self.log("  ⚠️ 没有可转换的节点")
+            return False
+
+        config = {
+            "mixed-port": 7890,
+            "socks-port": 7891,
+            "redir-port": 7892,
+            "allow-lan": False,
+            "bind-address": "127.0.0.1",
+            "mode": "rule",
+            "log-level": "error",
+            "ipv6": True,
+            "external-controller": f"{self.clash_api_host}:{self.clash_api_port}",
+            "proxies": clash_nodes,
+            "proxy-groups": [
+                {
+                    "name": "TEST",
+                    "type": "select",
+                    "proxies": ["DIRECT"] + [n["name"] for n in clash_nodes[:50]],
+                }
+            ],
+            "rules": ["MATCH,DIRECT"],
+        }
+
+        self.output_dir.mkdir(exist_ok=True)
+        with open(self.clash_config_file, "w", encoding="utf-8") as f:
+            yaml.dump(
+                config, f, allow_unicode=True, sort_keys=False, default_flow_style=False
+            )
+
+        self.log(f"  ✓ 生成了包含 {len(clash_nodes)} 个节点的Clash测试配置")
+        return True
+
+    def start_clash(self) -> bool:
+        """启动Clash进程"""
+        try:
+            if not self.clash_binary.exists():
+                clash_path = subprocess.run(
+                    ["which", "clash"], capture_output=True, text=True
+                )
+                if clash_path.returncode == 0 and clash_path.stdout.strip():
+                    self.clash_binary = Path(clash_path.stdout.strip())
+                else:
+                    self.log("  ⚠️ 未找到Clash二进制文件，跳过Clash测试")
+                    return False
+
+            self.log("  🚀 启动Clash内核...")
+            self.clash_process = subprocess.Popen(
+                [str(self.clash_binary), "-f", str(self.clash_config_file)],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            time.sleep(2)
+
+            if self.clash_process.poll() is not None:
+                self.log("  ⚠️ Clash启动失败")
+                return False
+
+            self.log("  ✓ Clash启动成功")
+            return True
+        except Exception as e:
+            self.log(f"  ⚠️ 启动Clash出错: {e}")
+            return False
+
+    def stop_clash(self):
+        """停止Clash进程"""
+        if self.clash_process:
+            try:
+                self.clash_process.terminate()
+                self.clash_process.wait(timeout=3)
+            except subprocess.TimeoutExpired:
+                self.clash_process.kill()
+            self.clash_process = None
+
+    async def wait_for_clash_api(self, timeout: int = 30) -> bool:
+        """等待Clash API就绪"""
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            try:
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(
+                        f"http://{self.clash_api_host}:{self.clash_api_port}/version",
+                        timeout=aiohttp.ClientTimeout(total=2),
+                    ) as response:
+                        if response.status == 200:
+                            data = await response.json()
+                            self.log(
+                                f"  ✓ Clash API就绪 (版本: {data.get('version', 'unknown')})"
+                            )
+                            return True
+            except:
+                await asyncio.sleep(0.5)
+        self.log("  ⚠️ Clash API未就绪")
+        return False
+
+    async def get_clash_proxies(self) -> List[Dict]:
+        """获取Clash中的代理列表"""
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(
+                    f"http://{self.clash_api_host}:{self.clash_api_port}/proxies",
+                    timeout=aiohttp.ClientTimeout(total=10),
+                ) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        proxies = data.get("proxies", {})
+                        node_proxies = []
+                        for name, info in proxies.items():
+                            if info.get("type") in [
+                                "ss",
+                                "vmess",
+                                "trojan",
+                                "vless",
+                                "ssr",
+                                "hysteria2",
+                                "tuic",
+                            ]:
+                                node_proxies.append(
+                                    {
+                                        "name": name,
+                                        "type": info.get("type"),
+                                    }
+                                )
+                        return node_proxies
+        except Exception as e:
+            self.log(f"  ⚠️ 获取代理列表失败: {e}")
+        return []
+
+    async def test_clash_proxy_delay(
+        self, proxy_name: str
+    ) -> Tuple[Optional[int], str]:
+        """测试单个代理的延迟（通过Clash API）"""
+        try:
+            encoded_name = urllib.parse.quote(proxy_name)
+            async with aiohttp.ClientSession() as session:
+                url = f"http://{self.clash_api_host}:{self.clash_api_port}/proxies/{encoded_name}/delay"
+                params = {
+                    "url": self.clash_test_url,
+                    "timeout": self.clash_test_timeout,
+                }
+                async with session.get(
+                    url, params=params, timeout=aiohttp.ClientTimeout(total=10)
+                ) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        delay = data.get("delay")
+                        if delay and delay > 0 and delay < self.max_latency:
+                            return delay, "success"
+                        else:
+                            return None, f"delay_{delay}ms" if delay else "timeout"
+                    else:
+                        return None, f"api_error_{response.status}"
+        except asyncio.TimeoutError:
+            return None, "timeout"
+        except Exception as e:
+            return None, f"error_{str(e)[:20]}"
+
+    async def test_all_clash_proxies(
+        self, proxies: List[Dict], tcp_passed_nodes: List[Dict]
+    ) -> List[Dict]:
+        """测试所有通过TCP的代理（使用Clash API）"""
+        if not proxies:
+            return tcp_passed_nodes
+
+        self.log(f"\n📡 阶段2: Clash真实代理测试 ({len(proxies)} 个节点)...")
+
+        semaphore = asyncio.Semaphore(20)
+        name_to_node = {
+            self._sanitize_name(n.get("name", "")): n for n in tcp_passed_nodes
+        }
+
+        async def test_proxy(proxy: Dict, index: int):
+            async with semaphore:
+                name = proxy["name"]
+                delay, status = await self.test_clash_proxy_delay(name)
+
+                if self.verbose and (index + 1) % 50 == 0:
+                    self.log(f"    进度: {index + 1}/{len(proxies)}")
+
+                return {
+                    "name": name,
+                    "type": proxy["type"],
+                    "delay": delay,
+                    "status": status,
+                    "index": index,
+                }
+
+        tasks = [test_proxy(proxy, i) for i, proxy in enumerate(proxies)]
+        results = await asyncio.gather(*tasks)
+
+        valid_nodes = []
+        clash_passed = 0
+        clash_failed = 0
+
+        for result in results:
+            original_node = name_to_node.get(result["name"])
+            if original_node and result["delay"]:
+                original_node["latency"] = result["delay"]
+                original_node["clash_test_passed"] = True
+                valid_nodes.append(original_node)
+                clash_passed += 1
+            else:
+                clash_failed += 1
+                reason = result.get("status", "unknown")
+                self.clash_failed_reasons[reason] = (
+                    self.clash_failed_reasons.get(reason, 0) + 1
+                )
+
+        self.log(f"  ✓ Clash通过: {clash_passed} 个节点")
+        self.log(f"  ✗ Clash失败: {clash_failed} 个节点")
+
+        return valid_nodes
 
     async def test_tcp_connect_semaphore(
         self, host: str, port: int, semaphore: asyncio.Semaphore
@@ -338,89 +686,49 @@ class HighPerformanceValidator:
             except Exception as e:
                 return False, float("inf"), f"错误"
 
-    def _build_proxy_url(self, node: Dict) -> Optional[str]:
-        """Build proxy URL from node configuration for aiohttp"""
+    async def validate_node_tcp(self, node: Dict) -> Tuple[bool, float, str]:
+        """测试节点TCP连接"""
+        server = node.get("server", "")
+        port = node.get("port", 0)
+
+        if not server or not port:
+            return False, float("inf"), "无效的服务器或端口"
+
         try:
-            proxy_type = node.get("type", "").lower()
-            server = node.get("server", "")
-            port = node.get("port", 0)
+            start_time = time.time()
 
-            if not server or not port:
-                return None
-
-            if proxy_type == "ss":
-                auth = f"{node.get('password', '')}"
-                return f"http://{server}:{port}"
-            elif proxy_type == "trojan":
-                password = node.get("password", "")
-                return f"http://{password}@{server}:{port}"
-            elif proxy_type == "vmess":
-                return f"http://{server}:{port}"
-            elif proxy_type == "vless":
-                uuid = node.get("uuid", "")
-                return f"http://{uuid}@{server}:{port}"
-            else:
-                return f"http://{server}:{port}"
-        except Exception:
-            return None
-
-    def _get_session(self) -> aiohttp.ClientSession:
-        """获取或创建复用的 aiohttp session"""
-        if self._session is None or self._session.closed:
-            self._connector = aiohttp.TCPConnector(
-                ssl=False,
-                limit=200,
-                ttl_dns_cache=300,
-                keepalive_timeout=30,
-            )
-            self._session = aiohttp.ClientSession(
-                connector=self._connector,
-                timeout=aiohttp.ClientTimeout(total=self.http_timeout),
-            )
-        return self._session
-
-    async def test_http_connectivity(
-        self, node: Dict, semaphore: asyncio.Semaphore
-    ) -> Tuple[bool, float, str]:
-        """Test HTTP connectivity through the proxy node"""
-        proxy_url = self._build_proxy_url(node)
-        if not proxy_url:
-            return False, float("inf"), "HTTP: 无法构建代理URL"
-
-        async with semaphore:
             try:
-                start_time = time.time()
-                session = self._get_session()
+                await asyncio.wait_for(
+                    asyncio.get_event_loop().getaddrinfo(server, None),
+                    timeout=Config.DNS_TIMEOUT,
+                )
+            except Exception:
+                return False, float("inf"), "DNS解析失败"
 
-                async with session.get(
-                    self.HTTP_TEST_URL, proxy=proxy_url, allow_redirects=True
-                ) as response:
-                    latency = (time.time() - start_time) * 1000
+            reader, writer = await asyncio.wait_for(
+                asyncio.open_connection(server, port), timeout=self.timeout
+            )
+            latency = (time.time() - start_time) * 1000
 
-                    if response.status in (204, 200, 301, 302):
-                        return True, latency, "HTTP连接成功"
-                    else:
-                        return False, latency, f"HTTP: 状态码 {response.status}"
+            writer.close()
+            await writer.wait_closed()
 
-            except aiohttp.ClientProxyConnectionError:
-                return False, float("inf"), "HTTP: 代理连接失败"
-            except aiohttp.ClientHttpProxyError as e:
-                return False, float("inf"), f"HTTP: 代理错误 {e.status}"
-            except aiohttp.ClientConnectorError:
-                return False, float("inf"), "HTTP: 连接失败"
-            except asyncio.TimeoutError:
-                return False, float("inf"), "HTTP: 请求超时"
-            except aiohttp.ClientError as e:
-                return False, float("inf"), f"HTTP: 客户端错误 {str(e)[:30]}"
-            except Exception as e:
-                return False, float("inf"), f"HTTP: 错误 {str(e)[:30]}"
+            if latency < self.max_latency:
+                return True, latency, "TCP连接成功"
+            else:
+                return False, latency, f"延迟过高({latency:.0f}ms)"
+
+        except asyncio.TimeoutError:
+            return False, float("inf"), "TCP连接超时"
+        except Exception as e:
+            return False, float("inf"), f"错误"
 
     async def validate_all_fast(self):
-        """高速验证所有节点"""
+        """高速验证所有节点 (TCP + Clash 双阶段)"""
         print("=" * 70)
-        print("🔒 高性能严格模式验证")
+        print("🔒 高性能严格模式验证 (TCP + Clash)")
         print("=" * 70)
-        print(f"并发数: {self.max_concurrent} 个连接")
+        print(f"TCP并发数: {self.max_concurrent} 个连接")
         print("")
 
         fetched_file = self.output_dir / "fetched_data.json"
@@ -432,16 +740,14 @@ class HighPerformanceValidator:
             subscriptions = json.load(f)
 
         all_nodes = []
-        node_source_map: Dict[str, str] = {}  # node_key -> subscription_url
+        node_source_map: Dict[str, str] = {}
 
-        # 解析所有订阅
         print("📥 解析订阅内容...")
         for sub in subscriptions:
             content = sub.get("content")
             url = sub.get("url", "")
             if content:
                 nodes = self.parse_subscription(content)
-                # 记录每个节点的来源订阅
                 for node in nodes:
                     node_key = f"{node['server']}:{node['port']}"
                     node_source_map[node_key] = url
@@ -453,14 +759,12 @@ class HighPerformanceValidator:
             print("\n⚠️  没有解析到任何节点")
             return
 
-        # 去重
         seen = set()
         unique_nodes = []
         for node in all_nodes:
             key = f"{node['server']}:{node['port']}"
             if key not in seen:
                 seen.add(key)
-                # 添加订阅来源信息
                 node["subscription_url"] = node_source_map.get(key, "")
                 node["subscription_score"] = self.subscription_scores.get(
                     node["subscription_url"], 0
@@ -468,13 +772,13 @@ class HighPerformanceValidator:
                 unique_nodes.append(node)
 
         print(f"\n✓ 共 {len(unique_nodes)} 个唯一节点")
-        print(f"🔍 开始高并发验证（TCP + HTTP 两阶段）...")
+        print(f"🔍 开始双阶段验证...")
         print("")
 
         start_time = time.time()
+
         semaphore = asyncio.Semaphore(self.max_concurrent)
 
-        # Phase 1: TCP test for all nodes
         print("📡 阶段1: TCP端口连接测试...")
         tcp_tasks = [
             self.test_tcp_connect_semaphore(node["server"], node["port"], semaphore)
@@ -505,63 +809,93 @@ class HighPerformanceValidator:
         print(f"  ✓ TCP通过: {len(tcp_passed_nodes)} 个节点")
         print(f"  ✗ TCP失败: {tcp_failed_count} 个节点")
 
-        # Phase 2: HTTP test for nodes that passed TCP
-        print(f"\n🌐 阶段2: HTTP代理连接测试（测试 {len(tcp_passed_nodes)} 个节点）...")
-        http_tasks = [
-            self.test_http_connectivity(node, semaphore) for node in tcp_passed_nodes
-        ]
-        http_results = await asyncio.gather(*http_tasks, return_exceptions=True)
+        if not tcp_passed_nodes:
+            print("\n⚠️  没有TCP通过的节点，跳过Clash测试")
+            valid_nodes = []
+            tcp_elapsed = time.time() - start_time
+            clash_passed = 0
+            clash_failed = 0
+            clash_elapsed = 0.0
+        else:
+            tcp_elapsed = time.time() - start_time
+            clash_start_time = time.time()
 
-        valid_nodes = []
-        http_passed_count = 0
-        http_failed_count = 0
-        for node, result in zip(tcp_passed_nodes, http_results):
-            if isinstance(result, Exception):
-                self.http_failed_reasons["HTTP: 异常错误"] = (
-                    self.http_failed_reasons.get("HTTP: 异常错误", 0) + 1
+            clash_elapsed = 0.0
+            clash_passed = 0
+            clash_failed = 0
+
+            if self.verbose:
+                print(
+                    f"\n📡 阶段2: Clash真实代理测试 ({len(tcp_passed_nodes)} 个节点)..."
                 )
-                http_failed_count += 1
-                continue
+
             try:
-                if isinstance(result, tuple) and len(result) == 3:
-                    is_valid, http_latency, reason = result
-                    if is_valid:
-                        node["latency"] = http_latency
-                        node["http_test_passed"] = True
-                        valid_nodes.append(node)
-                        http_passed_count += 1
+                if not self.generate_clash_config(tcp_passed_nodes):
+                    print("  ⚠️ Clash配置生成失败，跳过Clash测试")
+                    valid_nodes = tcp_passed_nodes
+                elif not self.start_clash():
+                    print("  ⚠️ Clash启动失败，跳过Clash测试")
+                    valid_nodes = tcp_passed_nodes
+                elif not await self.wait_for_clash_api():
+                    print("  ⚠️ Clash API未就绪，跳过Clash测试")
+                    self.stop_clash()
+                    valid_nodes = tcp_passed_nodes
+                else:
+                    proxies = await self.get_clash_proxies()
+                    if not proxies:
+                        print("  ⚠️ 无法获取代理列表，跳过Clash测试")
+                        valid_nodes = tcp_passed_nodes
                     else:
-                        self.http_failed_reasons[reason] = (
-                            self.http_failed_reasons.get(reason, 0) + 1
+                        clash_passed_nodes = await self.test_all_clash_proxies(
+                            proxies, tcp_passed_nodes
                         )
-                        http_failed_count += 1
-            except Exception:
-                http_failed_count += 1
+                        valid_nodes = clash_passed_nodes
+                        clash_elapsed = time.time() - clash_start_time
+                        clash_passed = len(clash_passed_nodes)
+                        clash_failed = len(tcp_passed_nodes) - clash_passed
+            except Exception as e:
+                print(f"  ⚠️ Clash测试出错: {e}")
+                valid_nodes = tcp_passed_nodes
+            finally:
+                self.stop_clash()
 
-        elapsed = time.time() - start_time
+            if clash_elapsed > 0:
+                print(f"\n  Clash测试耗时: {clash_elapsed:.1f}秒")
+                if clash_passed > 0:
+                    print(f"  Clash通过: {clash_passed} 个")
+                if clash_failed > 0:
+                    print(f"  Clash失败: {clash_failed} 个")
 
-        # 排序：优先按订阅评分降序，然后按延迟升序
+        total_elapsed = time.time() - start_time
+
+        for node in valid_nodes:
+            node["tcp_test_passed"] = True
+
         valid_nodes.sort(
             key=lambda x: (-x.get("subscription_score", 0), x.get("latency", 9999))
         )
 
-        # 保存验证统计
         validation_stats = {
             "timestamp": time.time(),
-            "mode": "strict-fast-tcp-http",
+            "mode": "tcp-clash",
             "total_nodes": len(unique_nodes),
-            "tcp_passed_nodes": len(tcp_passed_nodes),
-            "http_passed_nodes": len(valid_nodes),
-            "tcp_only_failed": tcp_failed_count,
-            "http_failed": http_failed_count,
             "valid_nodes": len(valid_nodes),
-            "success_rate": len(valid_nodes) / max(len(unique_nodes), 1),
+            "tcp_passed": len(tcp_passed_nodes),
+            "tcp_failed": tcp_failed_count,
+            "clash_passed": clash_passed if "clash_passed" in dir() else 0,
+            "clash_failed": clash_failed if "clash_failed" in dir() else 0,
+            "tcp_clash_success_rate": len(valid_nodes) / max(len(unique_nodes), 1),
             "tcp_success_rate": len(tcp_passed_nodes) / max(len(unique_nodes), 1),
-            "http_success_rate": len(valid_nodes) / max(len(tcp_passed_nodes), 1),
-            "elapsed_time": elapsed,
-            "nodes_per_second": len(unique_nodes) / elapsed if elapsed > 0 else 0,
-            "tcp_failure_reasons": self.failed_reasons,
-            "http_failure_reasons": self.http_failed_reasons,
+            "clash_success_rate": clash_passed / max(len(tcp_passed_nodes), 1)
+            if "clash_passed" in dir() and tcp_passed_nodes
+            else 0,
+            "elapsed_time": total_elapsed,
+            "tcp_elapsed": tcp_elapsed,
+            "nodes_per_second": len(unique_nodes) / tcp_elapsed
+            if tcp_elapsed > 0
+            else 0,
+            "failure_reasons": self.failed_reasons,
+            "clash_failure_reasons": self.clash_failed_reasons,
         }
 
         with open(
@@ -572,25 +906,24 @@ class HighPerformanceValidator:
         with open(self.output_dir / "valid_nodes.json", "w", encoding="utf-8") as f:
             json.dump(valid_nodes, f, indent=2, ensure_ascii=False)
 
-        # 保存订阅评分映射表供后续使用
         with open(
             self.output_dir / "subscription_scores.json", "w", encoding="utf-8"
         ) as f:
             json.dump(self.subscription_scores, f, indent=2, ensure_ascii=False)
 
-        # 统计
         print(f"\n{'=' * 70}")
-        print(f"✨ 验证完成！耗时: {elapsed:.1f}秒")
+        print(f"✨ 验证完成！总耗时: {total_elapsed:.1f}秒")
         print(f"{'=' * 70}")
         print(f"总节点: {len(unique_nodes)}")
         print(
             f"TCP通过: {len(tcp_passed_nodes)} ({len(tcp_passed_nodes) / max(len(unique_nodes), 1) * 100:.1f}%)"
         )
-        print(
-            f"HTTP通过: {len(valid_nodes)} ({len(valid_nodes) / max(len(unique_nodes), 1) * 100:.1f}%)"
-        )
-        if elapsed > 0:
-            print(f"速度: {len(unique_nodes) / elapsed:.0f} 节点/秒")
+        if "clash_passed" in dir():
+            print(
+                f"Clash通过: {clash_passed} ({clash_passed / max(len(tcp_passed_nodes), 1) * 100:.1f}%)"
+            )
+        if tcp_elapsed > 0:
+            print(f"TCP速度: {len(unique_nodes) / tcp_elapsed:.0f} 节点/秒")
 
         if self.failed_reasons:
             print(f"\n📊 TCP失败原因:")
@@ -599,34 +932,22 @@ class HighPerformanceValidator:
             )[:5]:
                 print(f"  • {reason}: {count}")
 
-        if self.http_failed_reasons:
-            print(f"\n📊 HTTP失败原因:")
+        if self.clash_failed_reasons:
+            print(f"\n📊 Clash失败原因:")
             for reason, count in sorted(
-                self.http_failed_reasons.items(), key=lambda x: -x[1]
+                self.clash_failed_reasons.items(), key=lambda x: -x[1]
             )[:5]:
                 print(f"  • {reason}: {count}")
 
         if valid_nodes:
-            print(f"\n🏆 前10个最优节点（HTTP延迟）:")
+            print(f"\n🏆 前10个最优节点:")
             for i, node in enumerate(valid_nodes[:10], 1):
-                latency = node.get("latency", 9999)
-                tcp_latency = node.get("tcp_latency", 0)
-                print(
-                    f"  {i:2}. {node['name'][:40]} [{node['type']}] HTTP:{latency:.1f}ms (TCP:{tcp_latency:.1f}ms)"
-                )
+                latency = node.get("latency", node.get("tcp_latency", 9999))
+                print(f"  {i:2}. {node['name'][:40]} [{node['type']}] {latency:.1f}ms")
 
             print(f"\n{'=' * 70}")
             print("✅ 验证结束")
             print(f"{'=' * 70}\n")
-
-    async def close(self):
-        """关闭 session"""
-        if self._session and not self._session.closed:
-            await self._session.close()
-            self._session = None
-        if self._connector:
-            self._connector.close()
-            self._connector = None
 
 
 def run_validator():
@@ -648,7 +969,6 @@ def run_validator():
         if pending:
             loop.run_until_complete(asyncio.gather(*pending, return_exceptions=True))
 
-        loop.run_until_complete(validator.close())
         loop.close()
 
 
