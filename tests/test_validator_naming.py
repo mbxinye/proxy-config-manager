@@ -42,6 +42,16 @@ class TestValidatorNaming(unittest.TestCase):
         self.assertEqual(nodes[1]["name"], "NA001_NA")
         self.assertEqual(nodes[2]["name"], "US001_1.0MBps")
 
+    def test_speed_worker_ports_and_split(self):
+        validator = Validator(verbose=False)
+        self.assertEqual(validator._get_speed_worker_ports(0), (7890, 7891, 9091))
+        self.assertEqual(validator._get_speed_worker_ports(1), (7900, 7901, 9101))
+
+        nodes = [{"name": "a"}, {"name": "b"}, {"name": "c"}, {"name": "d"}]
+        chunks = validator._split_speed_nodes(nodes, 2)
+        self.assertEqual(chunks[0], [nodes[0], nodes[2]])
+        self.assertEqual(chunks[1], [nodes[1], nodes[3]])
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -5,6 +5,7 @@
 """
 
 import asyncio
+import os
 import time
 from typing import Tuple
 import aiohttp
@@ -14,12 +15,17 @@ class SpeedTester:
   def __init__(self, proxy_url: str = "http://127.0.0.1:7890", verbose: bool = False):
     self.proxy_url = proxy_url
     self.verbose = verbose
-    self.test_urls = [
-      "https://speed.cloudflare.com/__down?bytes=10000000",
-      "https://cachefly.cachefly.net/10mb.bin",
-      "https://ipv4.download.thinkbroadband.com/5MB.zip"
-    ]
-    self.timeout = 15
+    urls_env = os.getenv("PROXY_SPEED_TEST_URLS", "").strip()
+    if urls_env:
+      self.test_urls = [u.strip() for u in urls_env.split(",") if u.strip()]
+    else:
+      self.test_urls = [
+        "https://speed.cloudflare.com/__down?bytes=2000000",
+        "https://cachefly.cachefly.net/5mb.bin"
+      ]
+    self.timeout = int(os.getenv("PROXY_SPEED_TIMEOUT", "8"))
+    self.max_duration = float(os.getenv("PROXY_SPEED_MAX_DURATION", "2.5"))
+    self.min_bytes = int(os.getenv("PROXY_SPEED_MIN_BYTES", str(512 * 1024)))
 
   def log(self, message: str):
     if self.verbose:
@@ -55,7 +61,7 @@ class SpeedTester:
                   break
                 downloaded_bytes += len(chunk)
                 duration = time.time() - start_time
-                if duration > 5 and downloaded_bytes > 2 * 1024 * 1024:
+                if duration >= self.max_duration or downloaded_bytes >= self.min_bytes:
                   break
           except asyncio.TimeoutError:
             last_exception = True

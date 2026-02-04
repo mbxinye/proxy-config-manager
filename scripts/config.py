@@ -26,11 +26,19 @@ class Config:
 
     MAX_OUTPUT_NODES = int(os.getenv("PROXY_MAX_OUTPUT_NODES", "100"))
 
+    CLASH_API_HOST = os.getenv("CLASH_API_HOST", "127.0.0.1")
+    CLASH_API_PORT = int(os.getenv("CLASH_API_PORT", "9091"))
+    CLASH_MIXED_PORT = int(os.getenv("CLASH_MIXED_PORT", "7890"))
+    CLASH_SOCKS_PORT = int(os.getenv("CLASH_SOCKS_PORT", "7891"))
+    CLASH_CORE = os.getenv("CLASH_CORE", "meta")
+
     CLASH_MAX_NODES_FULL = int(os.getenv("CLASH_MAX_NODES_FULL", "200"))
     CLASH_MAX_NODES_MINI = int(os.getenv("CLASH_MAX_NODES_MINI", "50"))
     CLASH_RENAME_NODES_ENABLED = (
         os.getenv("CLASH_RENAME_NODES_ENABLED", "true").lower() == "true"
     )
+    SPEED_TEST_LIMIT = int(os.getenv("PROXY_SPEED_TEST_LIMIT", "0"))
+    SPEED_TEST_WORKERS = int(os.getenv("PROXY_SPEED_WORKERS", "3"))
 
     @classmethod
     def to_dict(cls) -> Dict[str, Any]:
@@ -44,9 +52,16 @@ class Config:
             "max_latency_ms": cls.MAX_LATENCY_MS,
             "validation_mode": cls.VALIDATION_MODE,
             "max_output_nodes": cls.MAX_OUTPUT_NODES,
+            "clash_api_host": cls.CLASH_API_HOST,
+            "clash_api_port": cls.CLASH_API_PORT,
+            "clash_mixed_port": cls.CLASH_MIXED_PORT,
+            "clash_socks_port": cls.CLASH_SOCKS_PORT,
+            "clash_core": cls.CLASH_CORE,
             "clash_max_nodes_full": cls.CLASH_MAX_NODES_FULL,
             "clash_max_nodes_mini": cls.CLASH_MAX_NODES_MINI,
             "clash_rename_nodes_enabled": cls.CLASH_RENAME_NODES_ENABLED,
+            "speed_test_limit": cls.SPEED_TEST_LIMIT,
+            "speed_test_workers": cls.SPEED_TEST_WORKERS,
         }
 
     @classmethod

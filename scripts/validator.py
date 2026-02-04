@@ -33,7 +33,14 @@ class Validator:
     def __init__(self, verbose: bool = True):
         self.verbose = verbose
         self.parser = NodeParser(verbose=verbose)
-        self.clash = ClashManager(verbose=verbose)
+        self.clash = ClashManager(
+            api_host=Config.CLASH_API_HOST,
+            api_port=Config.CLASH_API_PORT,
+            mixed_port=Config.CLASH_MIXED_PORT,
+            socks_port=Config.CLASH_SOCKS_PORT,
+            core=Config.CLASH_CORE,
+            verbose=verbose,
+        )
         self.speed_tester = SpeedTester(verbose=verbose)
         self.output_dir = Path("output")
         self.data_dir = Path("data")
@@ -97,7 +104,21 @@ class Validator:
         try:
             # 1. 切换节点
             encoded_group = "TEST" # 策略组名称
-            url = f"{self.clash.api_url}/proxies/{encoded_group}"
+            return await self._switch_and_test_speed_with(self.clash, self.speed_tester, node_name)
+            
+        except Exception as e:
+            self.log(f"  ⚠️ 测速流程出错: {e}")
+            return 0.0, "Error"
+
+    async def _switch_and_test_speed_with(
+        self,
+        clash: ClashManager,
+        speed_tester: SpeedTester,
+        node_name: str,
+    ) -> Tuple[float, str]:
+        try:
+            encoded_group = "TEST"
+            url = f"{clash.api_url}/proxies/{encoded_group}"
             payload = {"name": node_name}
             
             async with aiohttp.ClientSession() as session:
@@ -111,10 +132,7 @@ class Validator:
                         return 0.0, "N/A"
             
             await asyncio.sleep(1.0)
-            
-            # 3. 测速
-            return await self.speed_tester.test_speed(node_name)
-            
+            return await speed_tester.test_speed(node_name)
         except Exception as e:
             self.log(f"  ⚠️ 测速流程出错: {e}")
             return 0.0, "Error"
@@ -149,6 +167,59 @@ class Validator:
         token = token.replace("/s", "ps").replace("/", "")
         token = re.sub(r"[^0-9a-zA-Z\.]", "", token)
         return token or "NA"
+
+    def _get_speed_worker_ports(self, worker_id: int) -> Tuple[int, int, int]:
+        base_offset = worker_id * 10
+        return (
+            Config.CLASH_MIXED_PORT + base_offset,
+            Config.CLASH_SOCKS_PORT + base_offset,
+            Config.CLASH_API_PORT + base_offset,
+        )
+
+    def _split_speed_nodes(self, nodes: List[Dict], workers: int) -> List[List[Dict]]:
+        chunks = [[] for _ in range(workers)]
+        for idx, node in enumerate(nodes):
+            chunks[idx % workers].append(node)
+        return chunks
+
+    async def _speed_worker(self, worker_id: int, nodes: List[Dict]) -> None:
+        if not nodes:
+            return
+
+        mixed_port, socks_port, api_port = self._get_speed_worker_ports(worker_id)
+        clash = ClashManager(
+            api_port=api_port,
+            mixed_port=mixed_port,
+            socks_port=socks_port,
+            core=Config.CLASH_CORE,
+            verbose=self.verbose,
+        )
+        config_path = self.output_dir / f"clash_speed_{worker_id}.yml"
+        count = clash.generate_config(
+            nodes,
+            config_path,
+            mixed_port=mixed_port,
+            socks_port=socks_port,
+            api_port=api_port,
+        )
+        if count == 0:
+            return
+        if not clash.start(config_path):
+            return
+        if not await clash.wait_for_api():
+            clash.stop()
+            return
+
+        speed_tester = SpeedTester(proxy_url=f"http://127.0.0.1:{mixed_port}", verbose=self.verbose)
+
+        for i, node in enumerate(nodes):
+            print(f"  [W{worker_id+1} {i+1}/{len(nodes)}] 测速: {node['name']} ...", end="", flush=True)
+            speed, speed_str = await self._switch_and_test_speed_with(clash, speed_tester, node["name"])
+            print(f" {speed_str}")
+            node["download_speed"] = speed
+            node["speed_str"] = speed_str
+
+        clash.stop()
 
     async def _rename_final_nodes(self, nodes: List[Dict]) -> None:
         from scripts.node_renamer import NodeRenamer
@@ -371,24 +442,28 @@ class Validator:
         self.stats["clash_passed"] = len(clash_passed_nodes)
         print(f"  ✓ Clash通过: {len(clash_passed_nodes)}/{len(tcp_passed_nodes)}")
 
-        # 4. 下载测速 (针对Top 50)
-        print("\n🏎️ 阶段3: 真实下载测速 (Top 50)...")
+        # 4. 下载测速 (所有通过Clash的节点)
+        speed_limit = Config.SPEED_TEST_LIMIT
+        speed_label = str(speed_limit) if speed_limit and speed_limit > 0 else "全部"
+        print(f"\n🏎️ 阶段3: 真实下载测速 ({speed_label})...")
         
-        target_nodes = clash_passed_nodes[:50] # 只测前50个，节省时间
-        final_nodes = []
-        
-        for i, node in enumerate(target_nodes):
-            print(f"  [{i+1}/{len(target_nodes)}] 测速: {node['name']} ...", end="", flush=True)
-            speed, speed_str = await self.switch_and_test_speed(node["name"])
-            print(f" {speed_str}")
-            
-            node["download_speed"] = speed
-            node["speed_str"] = speed_str
-            
-            final_nodes.append(node)
+        if self.clash.process:
+            self.clash.stop()
 
-        # 加上剩下的节点（未测速的）
-        final_nodes.extend(clash_passed_nodes[50:])
+        if speed_limit and speed_limit > 0:
+            target_nodes = clash_passed_nodes[:speed_limit]
+            rest_nodes = clash_passed_nodes[speed_limit:]
+        else:
+            target_nodes = list(clash_passed_nodes)
+            rest_nodes = []
+
+        workers = max(1, min(Config.SPEED_TEST_WORKERS, len(target_nodes)))
+        chunks = self._split_speed_nodes(target_nodes, workers)
+        tasks = [self._speed_worker(i, chunk) for i, chunk in enumerate(chunks)]
+        await asyncio.gather(*tasks)
+
+        final_nodes = list(target_nodes)
+        final_nodes.extend(rest_nodes)
 
         await self._rename_final_nodes(final_nodes)
         

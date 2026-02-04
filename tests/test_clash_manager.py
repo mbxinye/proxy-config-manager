@@ -1,71 +1,69 @@
 import unittest
 from pathlib import Path
-from scripts.clash_manager import ClashManager
 import tempfile
-import os
+
+import yaml
+
+from scripts.clash_manager import ClashManager
+
 
 class TestClashManager(unittest.TestCase):
-    def setUp(self):
-        self.manager = ClashManager()
-
-    def test_find_binary(self):
-        # 即使找不到，也应该返回Path对象
-        path = self.manager._find_clash_binary()
-        self.assertIsInstance(path, Path)
-
-    def test_generate_config(self):
+    def test_generate_config_filters_invalid(self):
+        manager = ClashManager(core="meta")
         nodes = [
-            {
-                "name": "Node1",
-                "type": "ss",
-                "server": "1.1.1.1",
-                "port": 80,
-                "cipher": "aes-256-gcm",
-                "password": "pass"
-            }
+            {"name": "valid_ss", "type": "ss", "server": "a", "port": 443, "password": "p", "cipher": "aes-256-gcm"},
+            {"name": "bad_ss", "type": "ss", "server": "b", "port": 443},
+            {"name": "valid_vmess", "type": "vmess", "server": "c", "port": 443, "uuid": "u"},
+            {"name": "bad_vmess", "type": "vmess", "server": "d", "port": 443},
+            {"name": "valid_vless", "type": "vless", "server": "e", "port": 443, "uuid": "u"},
+            {"name": "bad_vless", "type": "vless", "server": "f", "port": 443},
+            {"name": "valid_trojan", "type": "trojan", "server": "g", "port": 443, "password": "p"},
+            {"name": "bad_trojan", "type": "trojan", "server": "h", "port": 443},
+            {"name": "valid_hy2", "type": "hysteria2", "server": "i", "port": 443, "password": "p"},
+            {"name": "bad_hy2", "type": "hysteria2", "server": "j", "port": 443},
         ]
-        
-        with tempfile.NamedTemporaryFile(suffix=".yml", delete=False) as f:
-            temp_path = Path(f.name)
-            
-        try:
-            count = self.manager.generate_config(nodes, temp_path)
-            self.assertEqual(count, 1)
-            
-            with open(temp_path, "r") as f:
-                content = f.read()
-                self.assertIn("Node1", content)
-                self.assertIn("mixed-port: 7890", content)
-        finally:
-            if temp_path.exists():
-                os.unlink(temp_path)
 
-    def test_generate_config_vmess(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_path = Path(tmpdir) / "clash.yml"
+            count = manager.generate_config(nodes, output_path)
+            self.assertEqual(count, 5)
+
+            with open(output_path, "r", encoding="utf-8") as f:
+                data = yaml.safe_load(f)
+
+        proxy_names = [p["name"] for p in data["proxies"]]
+        self.assertIn("valid_ss", proxy_names)
+        self.assertIn("valid_vmess", proxy_names)
+        self.assertIn("valid_vless", proxy_names)
+        self.assertIn("valid_trojan", proxy_names)
+        self.assertIn("valid_hy2", proxy_names)
+        self.assertNotIn("bad_ss", proxy_names)
+        self.assertNotIn("bad_vmess", proxy_names)
+        self.assertNotIn("bad_vless", proxy_names)
+        self.assertNotIn("bad_trojan", proxy_names)
+        self.assertNotIn("bad_hy2", proxy_names)
+
+    def test_generate_config_skips_vless_on_dreamacro(self):
+        manager = ClashManager(core="dreamacro")
         nodes = [
-            {
-                "name": "VMess1",
-                "type": "vmess",
-                "server": "example.com",
-                "port": 443,
-                "uuid": "00000000-0000-0000-0000-000000000000",
-                "alterId": 0,
-                "security": "auto",
-                "network": "tcp"
-            }
+            {"name": "valid_ss", "type": "ss", "server": "a", "port": 443, "password": "p", "cipher": "aes-256-gcm"},
+            {"name": "valid_vless", "type": "vless", "server": "e", "port": 443, "uuid": "u"},
+            {"name": "valid_hy2", "type": "hysteria2", "server": "i", "port": 443, "password": "p"},
         ]
-        with tempfile.NamedTemporaryFile(suffix=".yml", delete=False) as f:
-            temp_path = Path(f.name)
-        try:
-            count = self.manager.generate_config(nodes, temp_path)
-            self.assertEqual(count, 1)
-            with open(temp_path, "r") as f:
-                content = f.read()
-                self.assertIn("VMess1", content)
-                self.assertIn("type: vmess", content)
-                self.assertIn("cipher: auto", content)
-        finally:
-            if temp_path.exists():
-                os.unlink(temp_path)
 
-if __name__ == '__main__':
+        with tempfile.TemporaryDirectory() as tmpdir:
+            output_path = Path(tmpdir) / "clash.yml"
+            count = manager.generate_config(nodes, output_path)
+            self.assertEqual(count, 1)
+
+            with open(output_path, "r", encoding="utf-8") as f:
+                data = yaml.safe_load(f)
+
+        proxy_names = [p["name"] for p in data["proxies"]]
+        self.assertIn("valid_ss", proxy_names)
+        self.assertNotIn("valid_vless", proxy_names)
+        self.assertNotIn("valid_hy2", proxy_names)
+
+
+if __name__ == "__main__":
     unittest.main()

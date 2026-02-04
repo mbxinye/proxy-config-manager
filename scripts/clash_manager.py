@@ -28,9 +28,20 @@ except ImportError:
 
 
 class ClashManager:
-    def __init__(self, api_host: str = "127.0.0.1", api_port: int = 9091, verbose: bool = False):
+    def __init__(
+        self,
+        api_host: str = "127.0.0.1",
+        api_port: int = 9091,
+        mixed_port: int = 7890,
+        socks_port: int = 7891,
+        core: Optional[str] = None,
+        verbose: bool = False,
+    ):
         self.api_host = api_host
         self.api_port = api_port
+        self.mixed_port = mixed_port
+        self.socks_port = socks_port
+        self.core = (core or Config.CLASH_CORE or "dreamacro").lower()
         self.verbose = verbose
         self.clash_binary = self._find_clash_binary()
         self.process: Optional[subprocess.Popen] = None
@@ -98,7 +109,11 @@ class ClashManager:
             time.sleep(1)
             if self.process.poll() is not None:
                 stdout, stderr = self.process.communicate(timeout=2)
-                self.log(f"  ⚠️ Clash启动失败: {stderr.decode('utf-8', errors='ignore')[:200]}")
+                stdout_text = stdout.decode("utf-8", errors="ignore")[:200] if stdout else ""
+                stderr_text = stderr.decode("utf-8", errors="ignore")[:200] if stderr else ""
+                rc = self.process.returncode
+                msg = stderr_text or stdout_text or "(no output)"
+                self.log(f"  ⚠️ Clash启动失败 (code={rc}): {msg}")
                 return False
                 
             return True
@@ -190,7 +205,15 @@ class ClashManager:
         except Exception as e:
             return None, f"error_{str(e)[:20]}"
 
-    def generate_config(self, nodes: List[Dict], output_path: Path) -> int:
+    def generate_config(
+        self,
+        nodes: List[Dict],
+        output_path: Path,
+        mixed_port: Optional[int] = None,
+        socks_port: Optional[int] = None,
+        api_host: Optional[str] = None,
+        api_port: Optional[int] = None,
+    ) -> int:
         """生成Clash配置文件"""
         filtered: List[Dict] = []
         for n in nodes:
@@ -200,6 +223,9 @@ class ClashManager:
             return 0
 
         converted: List[Dict] = []
+        allow_vless = self.core in ["meta", "mihomo", "clash.meta", "clash-meta", "meta-alpha"]
+        allow_hysteria2 = allow_vless
+
         for n in filtered:
             t = str(n.get("type", "")).lower()
             if t == "ss":
@@ -214,6 +240,16 @@ class ClashManager:
                         "udp": True
                     })
             elif t == "vmess":
+                if not n.get("uuid"):
+                    continue
+                ws_headers = {}
+                if n.get("host"):
+                    ws_headers["Host"] = n.get("host")
+                ws_opts = {}
+                if n.get("path"):
+                    ws_opts["path"] = n.get("path")
+                if ws_headers:
+                    ws_opts["headers"] = ws_headers
                 converted.append({
                     "name": n.get("name"),
                     "type": "vmess",
@@ -225,14 +261,23 @@ class ClashManager:
                     "udp": True,
                     **({"tls": True} if n.get("tls") else {}),
                     **({"servername": n.get("sni")} if n.get("sni") else {}),
-                    **({"network": "ws", "ws-opts": {"path": n.get("path", ""), "headers": {"Host": n.get("host", "")}}}
-                       if str(n.get("network", "")).lower() in ["ws", "websocket"] else {}),
+                    **({"network": "ws", "ws-opts": ws_opts} if str(n.get("network", "")).lower() in ["ws", "websocket"] and ws_opts else {}),
                     **({"network": "grpc", "grpc-opts": {"grpc-service-name": n.get("grpc-service-name", "")}}
                        if str(n.get("network", "")).lower() == "grpc" else {}),
                     **({"network": "h2", "h2-opts": {"path": n.get("path", "")}}
                        if str(n.get("network", "")).lower() == "h2" else {})
                 })
             elif t == "trojan":
+                if not n.get("password"):
+                    continue
+                ws_headers = {}
+                if n.get("host"):
+                    ws_headers["Host"] = n.get("host")
+                ws_opts = {}
+                if n.get("path"):
+                    ws_opts["path"] = n.get("path")
+                if ws_headers:
+                    ws_opts["headers"] = ws_headers
                 converted.append({
                     "name": n.get("name"),
                     "type": "trojan",
@@ -242,12 +287,15 @@ class ClashManager:
                     "udp": True,
                     **({"sni": n.get("sni")} if n.get("sni") else {}),
                     **({"skip-cert-verify": bool(n.get("skip-cert-verify"))} if "skip-cert-verify" in n else {}),
-                    **({"network": "ws", "ws-opts": {"path": n.get("path", ""), "headers": {"Host": n.get("host", "")}}}
-                       if str(n.get("network", "")).lower() == "ws" else {}),
+                    **({"network": "ws", "ws-opts": ws_opts} if str(n.get("network", "")).lower() == "ws" and ws_opts else {}),
                     **({"network": "grpc", "grpc-opts": {"grpc-service-name": n.get("grpc-service-name", "")}}
                        if str(n.get("network", "")).lower() == "grpc" else {})
                 })
             elif t == "vless":
+                if not allow_vless:
+                    continue
+                if not n.get("uuid"):
+                    continue
                 base = {
                     "name": n.get("name"),
                     "type": "vless",
@@ -267,13 +315,23 @@ class ClashManager:
                     base["tls"] = True
                 net = str(n.get("network", "")).lower()
                 if net == "ws":
+                    ws_opts = {}
+                    if n.get("path"):
+                        ws_opts["path"] = n.get("path")
+                    if n.get("host"):
+                        ws_opts["headers"] = {"Host": n.get("host")}
                     base["network"] = "ws"
-                    base["ws-opts"] = {"path": n.get("path", ""), "headers": {"Host": n.get("host", "")}}
+                    if ws_opts:
+                        base["ws-opts"] = ws_opts
                 elif net == "grpc":
                     base["network"] = "grpc"
                     base["grpc-opts"] = {"grpc-service-name": n.get("grpc-service-name", "")}
                 converted.append(base)
             elif t in ["hysteria2", "hy2"]:
+                if not allow_hysteria2:
+                    continue
+                if not n.get("password"):
+                    continue
                 converted.append({
                     "name": n.get("name"),
                     "type": "hysteria2",
@@ -289,14 +347,14 @@ class ClashManager:
             return 0
 
         config = {
-            "mixed-port": 7890,
-            "socks-port": 7891,
+            "mixed-port": mixed_port if mixed_port is not None else self.mixed_port,
+            "socks-port": socks_port if socks_port is not None else self.socks_port,
             "allow-lan": False,
             "bind-address": "127.0.0.1",
             "mode": "rule",
             "log-level": "info",
             "ipv6": True,
-            "external-controller": f"{self.api_host}:{self.api_port}",
+            "external-controller": f"{api_host or self.api_host}:{api_port or self.api_port}",
             "proxies": converted,
             "proxy-groups": [
                 {
