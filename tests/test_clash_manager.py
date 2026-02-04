@@ -40,5 +40,32 @@ class TestClashManager(unittest.TestCase):
             if temp_path.exists():
                 os.unlink(temp_path)
 
+    def test_generate_config_vmess(self):
+        nodes = [
+            {
+                "name": "VMess1",
+                "type": "vmess",
+                "server": "example.com",
+                "port": 443,
+                "uuid": "00000000-0000-0000-0000-000000000000",
+                "alterId": 0,
+                "security": "auto",
+                "network": "tcp"
+            }
+        ]
+        with tempfile.NamedTemporaryFile(suffix=".yml", delete=False) as f:
+            temp_path = Path(f.name)
+        try:
+            count = self.manager.generate_config(nodes, temp_path)
+            self.assertEqual(count, 1)
+            with open(temp_path, "r") as f:
+                content = f.read()
+                self.assertIn("VMess1", content)
+                self.assertIn("type: vmess", content)
+                self.assertIn("cipher: auto", content)
+        finally:
+            if temp_path.exists():
+                os.unlink(temp_path)
+
 if __name__ == '__main__':
     unittest.main()

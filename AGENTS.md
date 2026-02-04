@@ -33,6 +33,10 @@ python3 scripts/subscription_manager.py report    # Generate report
 # Generate Clash config
 python3 scripts/clash_generator.py generate
 
+> Notes
+- The generator always writes output/clash_config.yml and output/clash_mini.yml.
+- If there are no valid nodes, placeholder configs are generated so CI copy steps won’t fail.
+- Shadowrocket URI lists are written to output/shadowrocket_nodes_full.txt and output/shadowrocket_nodes_mini.txt.
 # Rename nodes by geographic location
 python3 scripts/node_renamer.py [input_file] [output_file]
 ```

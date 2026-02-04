@@ -192,17 +192,102 @@ class ClashManager:
 
     def generate_config(self, nodes: List[Dict], output_path: Path) -> int:
         """生成Clash配置文件"""
-        # 过滤无效节点
-        valid_nodes = []
-        for node in nodes:
-            # 确保必要字段存在
-            if "name" in node and "type" in node and "server" in node:
-                valid_nodes.append(node)
-                
-        if not valid_nodes:
+        filtered: List[Dict] = []
+        for n in nodes:
+            if "name" in n and "type" in n and "server" in n:
+                filtered.append(n)
+        if not filtered:
             return 0
 
-        # 生成基本配置
+        converted: List[Dict] = []
+        for n in filtered:
+            t = str(n.get("type", "")).lower()
+            if t == "ss":
+                if n.get("password") and n.get("cipher"):
+                    converted.append({
+                        "name": n.get("name"),
+                        "type": "ss",
+                        "server": n.get("server"),
+                        "port": int(n.get("port", 0)),
+                        "password": n.get("password"),
+                        "cipher": n.get("cipher"),
+                        "udp": True
+                    })
+            elif t == "vmess":
+                converted.append({
+                    "name": n.get("name"),
+                    "type": "vmess",
+                    "server": n.get("server"),
+                    "port": int(n.get("port", 443)),
+                    "uuid": n.get("uuid", ""),
+                    "alterId": int(n.get("alterId", 0)),
+                    "cipher": n.get("security", "auto"),
+                    "udp": True,
+                    **({"tls": True} if n.get("tls") else {}),
+                    **({"servername": n.get("sni")} if n.get("sni") else {}),
+                    **({"network": "ws", "ws-opts": {"path": n.get("path", ""), "headers": {"Host": n.get("host", "")}}}
+                       if str(n.get("network", "")).lower() in ["ws", "websocket"] else {}),
+                    **({"network": "grpc", "grpc-opts": {"grpc-service-name": n.get("grpc-service-name", "")}}
+                       if str(n.get("network", "")).lower() == "grpc" else {}),
+                    **({"network": "h2", "h2-opts": {"path": n.get("path", "")}}
+                       if str(n.get("network", "")).lower() == "h2" else {})
+                })
+            elif t == "trojan":
+                converted.append({
+                    "name": n.get("name"),
+                    "type": "trojan",
+                    "server": n.get("server"),
+                    "port": int(n.get("port", 443)),
+                    "password": n.get("password", ""),
+                    "udp": True,
+                    **({"sni": n.get("sni")} if n.get("sni") else {}),
+                    **({"skip-cert-verify": bool(n.get("skip-cert-verify"))} if "skip-cert-verify" in n else {}),
+                    **({"network": "ws", "ws-opts": {"path": n.get("path", ""), "headers": {"Host": n.get("host", "")}}}
+                       if str(n.get("network", "")).lower() == "ws" else {}),
+                    **({"network": "grpc", "grpc-opts": {"grpc-service-name": n.get("grpc-service-name", "")}}
+                       if str(n.get("network", "")).lower() == "grpc" else {})
+                })
+            elif t == "vless":
+                base = {
+                    "name": n.get("name"),
+                    "type": "vless",
+                    "server": n.get("server"),
+                    "port": int(n.get("port", 443)),
+                    "uuid": n.get("uuid", ""),
+                    "udp": True
+                }
+                if n.get("sni"):
+                    base["servername"] = n.get("sni")
+                if n.get("security") == "reality" and n.get("reality-opts"):
+                    base["tls"] = True
+                    base["reality-opts"] = n.get("reality-opts")
+                    if n.get("fingerprint"):
+                        base["fingerprint"] = n.get("fingerprint")
+                elif n.get("tls"):
+                    base["tls"] = True
+                net = str(n.get("network", "")).lower()
+                if net == "ws":
+                    base["network"] = "ws"
+                    base["ws-opts"] = {"path": n.get("path", ""), "headers": {"Host": n.get("host", "")}}
+                elif net == "grpc":
+                    base["network"] = "grpc"
+                    base["grpc-opts"] = {"grpc-service-name": n.get("grpc-service-name", "")}
+                converted.append(base)
+            elif t in ["hysteria2", "hy2"]:
+                converted.append({
+                    "name": n.get("name"),
+                    "type": "hysteria2",
+                    "server": n.get("server"),
+                    "port": int(n.get("port", 443)),
+                    "password": n.get("password", ""),
+                    **({"sni": n.get("sni")} if n.get("sni") else {})
+                })
+            else:
+                continue
+
+        if not converted:
+            return 0
+
         config = {
             "mixed-port": 7890,
             "socks-port": 7891,
@@ -212,12 +297,12 @@ class ClashManager:
             "log-level": "info",
             "ipv6": True,
             "external-controller": f"{self.api_host}:{self.api_port}",
-            "proxies": valid_nodes,
+            "proxies": converted,
             "proxy-groups": [
                 {
                     "name": "TEST",
                     "type": "select",
-                    "proxies": [n["name"] for n in valid_nodes]
+                    "proxies": [n["name"] for n in converted]
                 }
             ],
             "rules": ["MATCH,TEST"]
@@ -225,5 +310,4 @@ class ClashManager:
         
         with open(output_path, "w", encoding="utf-8") as f:
             yaml.dump(config, f, allow_unicode=True, sort_keys=False)
-            
-        return len(valid_nodes)
+        return len(converted)

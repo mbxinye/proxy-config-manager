@@ -227,6 +227,9 @@ output/
 └── valid_nodes.json           # 节点原始数据
 ```
 
+提示
+- 当无有效节点时，生成器会输出占位的 clash_config.yml/clash_mini.yml 与空的 URI 列表，便于工作流发布流程继续执行。
+
 ## 🔗 相关链接
 
 - [Shadowrocket 官网](https://shadowrocket.app/)
