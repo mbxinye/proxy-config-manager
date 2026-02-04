@@ -271,7 +271,7 @@ class NodeRenamer:
         return None
 
     def generate_new_name(
-        self, original_name: str, country_code: str, city: str, index: int = 0
+        self, original_name: str, country_code: str, city: str, index: int = 0, suffix_info: str = ""
     ) -> str:
         """生成新名称"""
         flag = self.COUNTRY_FLAGS.get(country_code, "")
@@ -301,10 +301,15 @@ class NodeRenamer:
         clean_name = clean_name.split("|")[0].split("-")[0].strip()
         clean_name = clean_name.split("#")[0].strip()
 
-        suffix = f" {index}" if index > 0 else ""
+        index_suffix = f" {index}" if index > 0 else ""
+        
+        base_name = f"{flag} {country_name}{index_suffix}"
         if city and city.lower() not in clean_name.lower():
-            return f"{flag} {city}, {country_name}{suffix}"
-        return f"{flag} {country_name}{suffix}"
+            base_name = f"{flag} {city}, {country_name}{index_suffix}"
+            
+        if suffix_info:
+            return f"{base_name} | {suffix_info}"
+        return base_name
 
     async def rename_nodes(self, nodes: List[Dict]) -> List[Dict]:
         """重命名所有节点"""
@@ -317,17 +322,15 @@ class NodeRenamer:
                 continue
 
             original_name = node.get("name", "")
+            speed_str = node.get("speed_str", "") # 获取测速结果
 
             existing_country = self.get_country_from_name(original_name)
             if existing_country and existing_country in self.COUNTRY_FLAGS:
                 country_code = existing_country
                 city = ""
-                for flag in self.COUNTRY_FLAGS.values():
-                    if original_name.startswith(flag):
-                        original_name = original_name[len(flag) :].strip(" |")
-                        break
-
-                new_name = self.generate_new_name(original_name, country_code, city)
+                # ... existing logic for cleaning name ...
+                
+                new_name = self.generate_new_name(original_name, country_code, city, suffix_info=speed_str)
                 node["name"] = new_name
                 node["original_name"] = original_name
                 continue
@@ -353,8 +356,9 @@ class NodeRenamer:
                     country_code = location.get("countryCode", "")
                     city = location.get("city", "")
                     original_name = nodes[idx].get("name", "")
+                    speed_str = nodes[idx].get("speed_str", "")
 
-                    new_name = self.generate_new_name(original_name, country_code, city)
+                    new_name = self.generate_new_name(original_name, country_code, city, suffix_info=speed_str)
                     nodes[idx]["name"] = new_name
                     nodes[idx]["original_name"] = original_name
                     nodes[idx]["location"] = {

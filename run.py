@@ -66,7 +66,7 @@ def validate_nodes():
     print("🔍 测试节点...")
     import subprocess
 
-    subprocess.run([sys.executable, "scripts/validator_fast.py"], capture_output=True)
+    subprocess.run([sys.executable, "-m", "scripts.validator"], capture_output=False)
 
 
 def update_scores():
