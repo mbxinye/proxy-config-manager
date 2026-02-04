@@ -108,8 +108,7 @@ class Validator:
                         self.log(f"  ⚠️ 切换节点失败 {node_name}: {response.status}")
                         return 0.0, "N/A"
             
-            # 2. 稍微等待切换生效
-            await asyncio.sleep(0.5)
+            await asyncio.sleep(1.0)
             
             # 3. 测速
             return await self.speed_tester.test_speed(node_name)
@@ -118,6 +117,28 @@ class Validator:
             self.log(f"  ⚠️ 测速流程出错: {e}")
             return 0.0, "Error"
 
+    def _compact_name(self, name: str, speed_str: str) -> str:
+        import re
+        flag = ""
+        if re.match(r"^[\U0001F1E6-\U0001F1FF]{2}", name or ""):
+            flag = name[:2]
+            base = (name or "")[2:].strip()
+        else:
+            base = (name or "").strip()
+        speed_token = speed_str.replace(" ", "")
+        max_len = 15
+        sep = " "
+        available = max_len - len(flag) - len(sep) - len(speed_token)
+        if available < 1:
+            sep = ""
+            available = max_len - len(flag) - len(speed_token)
+        if available < 1:
+            available = 1
+        base = base[:available]
+        result = f"{flag}{base}{sep}{speed_token}"
+        if len(result) > max_len:
+            result = result[:max_len]
+        return result
     def save_stats(self, unique_nodes: List[Dict], valid_nodes: List[Dict]):
         """保存统计数据 (兼容 subscription_manager)"""
         sub_stats = {}
@@ -298,13 +319,7 @@ class Validator:
             # 重命名
             if speed > 0.1: # 有效速度
                 # 提取国旗/地区 (如果有)
-                import re
-                flag = ""
-                if re.match(r"^[\U0001F1E6-\U0001F1FF]{2}", node["name"]):
-                    flag = node["name"][:2]
-                
-                new_name = f"{flag} {node['name'].replace(flag, '').strip()} | {speed_str}"
-                node["name"] = new_name
+                node["name"] = self._compact_name(node["name"], speed_str)
                 final_nodes.append(node)
             else:
                 # 测速失败但延迟通过，保留原名
