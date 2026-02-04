@@ -10,6 +10,8 @@ import json
 import socket
 import time
 import sys
+import ipaddress
+import re
 from pathlib import Path
 from typing import Dict, List, Tuple
 
@@ -139,6 +141,73 @@ class Validator:
         if len(result) > max_len:
             result = result[:max_len]
         return result
+
+    def _normalize_speed_token(self, speed_str: str) -> str:
+        if not speed_str or speed_str in ["Error", "N/A"]:
+            return "NA"
+        token = speed_str.replace(" ", "")
+        token = token.replace("/s", "ps").replace("/", "")
+        token = re.sub(r"[^0-9a-zA-Z\.]", "", token)
+        return token or "NA"
+
+    async def _rename_final_nodes(self, nodes: List[Dict]) -> None:
+        from scripts.node_renamer import NodeRenamer
+
+        renamer = NodeRenamer()
+        country_by_index: Dict[int, str] = {}
+        ip_tasks: Dict[str, List[int]] = {}
+
+        for i, node in enumerate(nodes):
+            original_name = node.get("name", "")
+            country_code = renamer.get_country_from_name(original_name) if original_name else None
+            if country_code:
+                country_by_index[i] = country_code.upper()
+                continue
+
+            server = node.get("server", "")
+            if not server:
+                country_by_index[i] = "NA"
+                continue
+
+            ip = server
+            try:
+                ipaddress.ip_address(server)
+            except ValueError:
+                ip = await self._resolve_domain(server)
+
+            if not ip:
+                country_by_index[i] = "NA"
+                continue
+
+            ip_tasks.setdefault(ip, []).append(i)
+
+        if ip_tasks:
+            semaphore = asyncio.Semaphore(50)
+
+            async def query_with_semaphore(ip: str):
+                async with semaphore:
+                    return await renamer.query_ip_location(ip)
+
+            tasks = [query_with_semaphore(ip) for ip in ip_tasks.keys()]
+            results = await asyncio.gather(*tasks)
+
+            for ip, location in zip(ip_tasks.keys(), results):
+                country_code = ""
+                if location:
+                    country_code = location.get("countryCode", "")
+                country_code = country_code.upper() if country_code else "NA"
+                for idx in ip_tasks[ip]:
+                    country_by_index[idx] = country_code
+
+        renamer.save_cache()
+
+        counters: Dict[str, int] = {}
+        for i, node in enumerate(nodes):
+            country_code = country_by_index.get(i, "NA") or "NA"
+            counters[country_code] = counters.get(country_code, 0) + 1
+            index = counters[country_code]
+            speed_token = self._normalize_speed_token(node.get("speed_str", ""))
+            node["name"] = f"{country_code}{index:03d}_{speed_token}"
     def save_stats(self, unique_nodes: List[Dict], valid_nodes: List[Dict]):
         """保存统计数据 (兼容 subscription_manager)"""
         sub_stats = {}
@@ -316,17 +385,12 @@ class Validator:
             node["download_speed"] = speed
             node["speed_str"] = speed_str
             
-            # 重命名
-            if speed > 0.1: # 有效速度
-                # 提取国旗/地区 (如果有)
-                node["name"] = self._compact_name(node["name"], speed_str)
-                final_nodes.append(node)
-            else:
-                # 测速失败但延迟通过，保留原名
-                final_nodes.append(node)
+            final_nodes.append(node)
 
         # 加上剩下的节点（未测速的）
         final_nodes.extend(clash_passed_nodes[50:])
+
+        await self._rename_final_nodes(final_nodes)
         
         # 5. 输出结果
         print(f"\n💾 保存结果...")

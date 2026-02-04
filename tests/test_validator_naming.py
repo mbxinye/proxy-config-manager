@@ -1,24 +1,47 @@
+import asyncio
 import unittest
+from unittest.mock import patch
+
 from scripts.validator import Validator
 
+
+class DummyRenamer:
+    def __init__(self):
+        self.saved = False
+
+    def get_country_from_name(self, name: str):
+        if "us" in name.lower():
+            return "US"
+        return None
+
+    async def query_ip_location(self, ip: str):
+        if ip == "1.1.1.1":
+            return {"countryCode": "JP"}
+        return None
+
+    def save_cache(self):
+        self.saved = True
+
+
 class TestValidatorNaming(unittest.TestCase):
-  def setUp(self):
-    self.v = Validator(verbose=False)
+    def test_rename_final_nodes(self):
+        validator = Validator(verbose=False)
+        nodes = [
+            {"name": "alpha", "server": "1.1.1.1", "speed_str": "12.3 MB/s"},
+            {"name": "beta", "server": "2.2.2.2", "speed_str": "Error"},
+            {"name": "us node", "server": "3.3.3.3", "speed_str": "1.0 MB/s"},
+        ]
 
-  def test_compact_no_flag(self):
-    name = "VeryLongNodeName"
-    speed = "3.2 MB/s"
-    result = self.v._compact_name(name, speed)
-    self.assertLessEqual(len(result), 15)
-    self.assertIn("MB/s", result)
+        with patch("scripts.node_renamer.NodeRenamer", DummyRenamer):
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            loop.run_until_complete(validator._rename_final_nodes(nodes))
+            loop.close()
 
-  def test_compact_with_flag(self):
-    name = "🇺🇸 UnitedStatesFastNode"
-    speed = "512 KB/s"
-    result = self.v._compact_name(name, speed)
-    self.assertLessEqual(len(result), 15)
-    self.assertTrue(result.startswith("🇺🇸"))
-    self.assertIn("KB/s", result)
+        self.assertEqual(nodes[0]["name"], "JP001_12.3MBps")
+        self.assertEqual(nodes[1]["name"], "NA001_NA")
+        self.assertEqual(nodes[2]["name"], "US001_1.0MBps")
 
-if __name__ == '__main__':
-  unittest.main()
+
+if __name__ == "__main__":
+    unittest.main()

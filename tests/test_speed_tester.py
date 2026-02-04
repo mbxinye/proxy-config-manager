@@ -43,5 +43,9 @@ class TestSpeedTester(unittest.TestCase):
         ok_status = speed_str in ["Error", "N/A"]
         self.assertTrue(ok_suffix or ok_status)
 
+    def test_format_speed(self):
+        self.assertEqual(self.tester._format_speed(100), "100.0 B/s")
+        self.assertEqual(self.tester._format_speed(2048), "2.0 KB/s")
+
 if __name__ == '__main__':
     unittest.main()

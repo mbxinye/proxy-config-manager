@@ -6,7 +6,7 @@
 
 import asyncio
 import time
-from typing import Optional, Tuple
+from typing import Tuple
 import aiohttp
 from aiohttp import ClientTimeout
 
@@ -76,11 +76,11 @@ class SpeedTester:
     except Exception:
       return 0.0, "Error"
 
-    def _format_speed(self, speed_bps: float) -> str:
-        """格式化速度显示"""
-        if speed_bps < 1024:
-            return f"{speed_bps:.1f} B/s"
-        elif speed_bps < 1024 * 1024:
-            return f"{speed_bps/1024:.1f} KB/s"
-        else:
-            return f"{speed_bps/(1024*1024):.1f} MB/s"
+  def _format_speed(self, speed_bps: float) -> str:
+    """格式化速度显示"""
+    if speed_bps < 1024:
+      return f"{speed_bps:.1f} B/s"
+    elif speed_bps < 1024 * 1024:
+      return f"{speed_bps/1024:.1f} KB/s"
+    else:
+      return f"{speed_bps/(1024*1024):.1f} MB/s"
