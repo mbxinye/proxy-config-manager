@@ -1,0 +1,941 @@
+mixed-port: 7890
+socks-port: 7891
+redir-port: 7892
+tproxy-port: 7893
+allow-lan: true
+bind-address: '*'
+mode: rule
+log-level: info
+ipv6: true
+external-controller: 127.0.0.1:9090
+tcp-concurrent: true
+enable-process: true
+find-process-mode: strict
+profile:
+  store-selected: true
+  store-fake-ip: true
+sniffer:
+  enable: true
+  sniff:
+    TLS:
+      ports:
+      - '443'
+      - '8443'
+    HTTP:
+      ports:
+      - '80'
+      - 8080-8880
+      override-destination: true
+tun:
+  enable: false
+  stack: system
+  dns-hijack:
+  - 8.8.8.8:53
+  - 8.8.4.4:53
+  auto-route: true
+  auto-detect-interface: true
+dns:
+  enable: true
+  listen: 0.0.0.0:1053
+  ipv6: true
+  default-nameserver:
+  - 223.5.5.5
+  - 119.29.29.29
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  fake-ip-filter:
+  - '*.lan'
+  - '*.localdomain'
+  - '*.example'
+  - '*.localhost'
+  - '*.test'
+  - '*.local'
+  - '*.home.arpa'
+  - msftconnecttest.com
+  - msftncsi.com
+  - time.*.com
+  - time.*.gov
+  - time.*.edu.cn
+  - time.*.apple.com
+  - time-ios.apple.com
+  - ntp.*.com
+  - ntp1.*.com
+  - ntp2.*.com
+  - ntp3.*.com
+  - ntp4.*.com
+  - ntp5.*.com
+  - ntp6.*.com
+  - ntp7.*.com
+  - time1.*.com
+  - time2.*.com
+  - time3.*.com
+  - time4.*.com
+  - time5.*.com
+  - time6.*.com
+  - time7.*.com
+  - '*.time.edu.cn'
+  - '*.ntp.org.cn'
+  - +.pool.ntp.org
+  - '*.stun.*'
+  - stun.*
+  - '*.stun.*.*'
+  - '*.stun.*.*.*'
+  - '*.stun.*.*.*.*'
+  - hostname.bind
+  - t1.*.*.*
+  - t2.*.*.*
+  - t3.*.*.*
+  - t4.*.*.*
+  - t5.*.*.*
+  - t6.*.*.*
+  - t7.*.*.*
+  nameserver:
+  - https://doh.pub/dns-query
+  - https://dns.alidns.com/dns-query
+  fallback:
+  - https://1.1.1.1/dns-query
+  - https://8.8.8.8/dns-query
+  - https://dns.google/dns-query
+  fallback-filter:
+    geoip: true
+    geoip-code: CN
+    geosite:
+    - gfw
+    ipcidr:
+    - 240.0.0.0/4
+    - 0.0.0.0/32
+proxies:
+- name: DE002_251.9KBps
+  type: vless
+  server: 103.245.237.124
+  port: 58202
+  uuid: cca053d5-7123-4a87-83d6-babe4e9c8115
+  udp: true
+  skip-cert-verify: false
+  network: ws
+- name: DE003_888.1Bps
+  type: vmess
+  server: v33.hdacd.com
+  port: 30833
+  uuid: cbb3f877-d1fb-344c-87a9-d153bffd5484
+  alterId: 2
+  cipher: auto
+  udp: true
+- name: US001_NA
+  type: vmess
+  server: v29.hdacd.com
+  port: 30829
+  uuid: cbb3f877-d1fb-344c-87a9-d153bffd5484
+  alterId: 2
+  cipher: auto
+  udp: true
+- name: SG002_NA
+  type: vmess
+  server: v45.hdacd.com
+  port: 30845
+  uuid: cbb3f877-d1fb-344c-87a9-d153bffd5484
+  alterId: 2
+  cipher: auto
+  udp: true
+- name: HK004_NA
+  type: vmess
+  server: v10.hdacd.com
+  port: 30807
+  uuid: cbb3f877-d1fb-344c-87a9-d153bffd5484
+  alterId: 2
+  cipher: auto
+  udp: true
+- name: CA001_NA
+  type: trojan
+  server: tuntro006.instconn.com
+  port: 443
+  password: 63b21d86-a49c-4936-a634-0b5af3e30433
+  udp: true
+  skip-cert-verify: true
+  sni: torontorm1.686911.xyz
+- name: JP001_255.8KBps
+  type: trojan
+  server: 18.181.173.100
+  port: 1933
+  password: 5fb072e0ddd631cf66cf752b09210480
+  udp: true
+  skip-cert-verify: false
+  sni: www.nintendogames.net
+- name: JP002_482.6KBps
+  type: trojan
+  server: 160.16.63.16
+  port: 3423
+  password: 5fb072e0ddd631cf66cf752b09210480
+  udp: true
+  skip-cert-verify: true
+  sni: www.nintendogames.net
+- name: CN002_352.9KBps
+  type: trojan
+  server: 218.250.156.130
+  port: 443
+  password: BxceQaOe
+  udp: true
+  skip-cert-verify: true
+- name: ES001_387.8KBps
+  type: trojan
+  server: 80.173.231.254
+  port: 12420
+  password: wp9IsiY82uQhcmgNC1eoBM
+  udp: true
+  skip-cert-verify: true
+  sni: www.semanticstaplegun.click
+- name: HK001_361.0KBps
+  type: trojan
+  server: 58.152.53.45
+  port: 443
+  password: BxceQaOe
+  udp: true
+  skip-cert-verify: true
+  sni: t.me%25252Fripaojiedian
+- name: JP003_411.3KBps
+  type: trojan
+  server: 54.95.118.21
+  port: 3373
+  password: 5fb072e0ddd631cf66cf752b09210480
+  udp: true
+  skip-cert-verify: true
+  sni: www.nintendogames.net
+- name: SG001_392.1KBps
+  type: trojan
+  server: 160.16.70.180
+  port: 3901
+  password: 5fb072e0ddd631cf66cf752b09210480
+  udp: true
+  skip-cert-verify: true
+  sni: www.nintendogames.net
+- name: JP004_399.4KBps
+  type: trojan
+  server: 13.231.53.184
+  port: 3076
+  password: 5fb072e0ddd631cf66cf752b09210480
+  udp: true
+  skip-cert-verify: false
+  sni: www.nintendogames.net
+- name: JP005_398.1KBps
+  type: trojan
+  server: 153.121.38.213
+  port: 276
+  password: 5fb072e0ddd631cf66cf752b09210480
+  udp: true
+  skip-cert-verify: false
+  sni: www.nintendogames.net
+- name: JP006_389.6KBps
+  type: trojan
+  server: 160.16.130.21
+  port: 544
+  password: 5fb072e0ddd631cf66cf752b09210480
+  udp: true
+  skip-cert-verify: true
+  sni: www.nintendogames.net
+- name: DE001_NA
+  type: trojan
+  server: tuntro010.instconn.com
+  port: 443
+  password: 63b21d86-a49c-4936-a634-0b5af3e30433
+  udp: true
+  skip-cert-verify: true
+  sni: frankfurtrm2.686911.xyz
+- name: IS001_297.4KBps
+  type: trojan
+  server: 37.235.49.209
+  port: 28099
+  password: qmBSKnAl6LYi9=z23Rs.Z
+  udp: true
+  skip-cert-verify: true
+  sni: celestialcorset.crystalhamster.click
+- name: HK002_100.0KBps
+  type: trojan
+  server: 219.76.135.98
+  port: 443
+  password: BxceQaOe
+  udp: true
+  skip-cert-verify: true
+  sni: t.me%252Fripaojiedian
+- name: HK003_232.5KBps
+  type: trojan
+  server: 112.120.31.36
+  port: 443
+  password: BxceQaOe
+  udp: true
+  skip-cert-verify: true
+  sni: t.me/ripaojiedian
+- name: CL001_415.4KBps
+  type: ss
+  server: 38.54.20.59
+  port: 8881
+  password: kDWvXYZoTBcGkC4
+  cipher: aes-256-gcm
+  udp: true
+- name: NL001_375.1KBps
+  type: ss
+  server: 82.38.31.208
+  port: 8080
+  password: k1dBOmOB4oqi7Ump37a1bQ
+  cipher: chacha20-ietf-poly1305
+  udp: true
+- name: CN001_337.3KBps
+  type: ss
+  server: 185.189.160.105
+  port: 41632
+  password: qwerREWQ@@
+  cipher: aes-256-cfb
+  udp: true
+- name: VN001_NA
+  type: ss
+  server: 103.186.154.244
+  port: 38388
+  password: Xn8jKdmDM00IeO%#$#fJAMtsEAEUOpH/YWYtYqDFnT0SV
+  cipher: aes-256-cfb
+  udp: true
+- name: VN002_NA
+  type: ss
+  server: 103.186.155.205
+  port: 38388
+  password: Xn8jKdmDM00IeO%#$#fJAMtsEAEUOpH/YWYtYqDFnT0SV
+  cipher: aes-256-cfb
+  udp: true
+- name: VN003_NA
+  type: ss
+  server: 103.186.154.69
+  port: 38388
+  password: Xn8jKdmDM00IeO%#$#fJAMtsEAEUOpH/YWYtYqDFnT0SV
+  cipher: aes-256-cfb
+  udp: true
+- name: NL002_45.7KBps
+  type: ss
+  server: 45.82.67.45
+  port: 16487
+  password: twoDiswqDsjyWvnAenf6DjmqFvPO53zY
+  cipher: aes-128-gcm
+  udp: true
+- name: CN003_NA
+  type: ss
+  server: 103.149.183.200
+  port: 8388
+  password: asd123456
+  cipher: chacha20-ietf
+  udp: true
+- name: US002_1.0KBps
+  type: ss
+  server: 173.225.106.117
+  port: 12484
+  password: F9fBiCNRgeA8yKBdsPVIkssLJzTQfbn0
+  cipher: aes-128-gcm
+  udp: true
+proxy-groups:
+- name: 🚀 节点选择
+  type: select
+  proxies:
+  - ♻️ 自动选择
+  - 🔯 故障转移
+  - DIRECT
+  - DE002_251.9KBps
+  - DE003_888.1Bps
+  - US001_NA
+  - SG002_NA
+  - HK004_NA
+  - CA001_NA
+  - JP001_255.8KBps
+  - JP002_482.6KBps
+  - CN002_352.9KBps
+  - ES001_387.8KBps
+  - HK001_361.0KBps
+  - JP003_411.3KBps
+  - SG001_392.1KBps
+  - JP004_399.4KBps
+  - JP005_398.1KBps
+  - JP006_389.6KBps
+  - DE001_NA
+  - IS001_297.4KBps
+  - HK002_100.0KBps
+  - HK003_232.5KBps
+  - CL001_415.4KBps
+  - NL001_375.1KBps
+  - CN001_337.3KBps
+  - VN001_NA
+  - VN002_NA
+  - VN003_NA
+  - NL002_45.7KBps
+  - CN003_NA
+  - US002_1.0KBps
+- name: 🎯 全球直连
+  type: select
+  proxies:
+  - DIRECT
+  - 🚀 节点选择
+- name: ♻️ 自动选择
+  type: url-test
+  url: http://www.google.com/generate_204
+  interval: 300
+  tolerance: 50
+  proxies:
+  - DE002_251.9KBps
+  - DE003_888.1Bps
+  - US001_NA
+  - SG002_NA
+  - HK004_NA
+  - CA001_NA
+  - JP001_255.8KBps
+  - JP002_482.6KBps
+  - CN002_352.9KBps
+  - ES001_387.8KBps
+  - HK001_361.0KBps
+  - JP003_411.3KBps
+  - SG001_392.1KBps
+  - JP004_399.4KBps
+  - JP005_398.1KBps
+  - JP006_389.6KBps
+  - DE001_NA
+  - IS001_297.4KBps
+  - HK002_100.0KBps
+  - HK003_232.5KBps
+  - CL001_415.4KBps
+  - NL001_375.1KBps
+  - CN001_337.3KBps
+  - VN001_NA
+  - VN002_NA
+  - VN003_NA
+  - NL002_45.7KBps
+  - CN003_NA
+  - US002_1.0KBps
+- name: 🔯 故障转移
+  type: fallback
+  url: http://www.google.com/generate_204
+  interval: 180
+  proxies:
+  - DE002_251.9KBps
+  - DE003_888.1Bps
+  - US001_NA
+  - SG002_NA
+  - HK004_NA
+  - CA001_NA
+  - JP001_255.8KBps
+  - JP002_482.6KBps
+  - CN002_352.9KBps
+  - ES001_387.8KBps
+  - HK001_361.0KBps
+  - JP003_411.3KBps
+  - SG001_392.1KBps
+  - JP004_399.4KBps
+  - JP005_398.1KBps
+  - JP006_389.6KBps
+  - DE001_NA
+  - IS001_297.4KBps
+  - HK002_100.0KBps
+  - HK003_232.5KBps
+- name: 📹 油管视频
+  type: select
+  proxies:
+  - 🚀 节点选择
+  - ♻️ 自动选择
+  - 🔯 故障转移
+  - DIRECT
+  - DE002_251.9KBps
+  - DE003_888.1Bps
+  - US001_NA
+  - SG002_NA
+  - HK004_NA
+  - CA001_NA
+  - JP001_255.8KBps
+  - JP002_482.6KBps
+  - CN002_352.9KBps
+  - ES001_387.8KBps
+  - HK001_361.0KBps
+  - JP003_411.3KBps
+  - SG001_392.1KBps
+  - JP004_399.4KBps
+  - JP005_398.1KBps
+  - JP006_389.6KBps
+  - DE001_NA
+  - IS001_297.4KBps
+  - HK002_100.0KBps
+  - HK003_232.5KBps
+- name: 🎥 奈飞视频
+  type: select
+  proxies:
+  - 🚀 节点选择
+  - ♻️ 自动选择
+  - 🔯 故障转移
+  - DIRECT
+  - DE002_251.9KBps
+  - DE003_888.1Bps
+  - US001_NA
+  - SG002_NA
+  - HK004_NA
+  - CA001_NA
+  - JP001_255.8KBps
+  - JP002_482.6KBps
+  - CN002_352.9KBps
+  - ES001_387.8KBps
+  - HK001_361.0KBps
+  - JP003_411.3KBps
+  - SG001_392.1KBps
+  - JP004_399.4KBps
+  - JP005_398.1KBps
+  - JP006_389.6KBps
+  - DE001_NA
+  - IS001_297.4KBps
+  - HK002_100.0KBps
+  - HK003_232.5KBps
+- name: 📺 巴哈姆特
+  type: select
+  proxies:
+  - 🚀 节点选择
+  - ♻️ 自动选择
+  - 🔯 故障转移
+  - DIRECT
+  - DE002_251.9KBps
+  - DE003_888.1Bps
+  - US001_NA
+  - SG002_NA
+  - HK004_NA
+  - CA001_NA
+  - JP001_255.8KBps
+  - JP002_482.6KBps
+  - CN002_352.9KBps
+  - ES001_387.8KBps
+  - HK001_361.0KBps
+  - JP003_411.3KBps
+  - SG001_392.1KBps
+  - JP004_399.4KBps
+  - JP005_398.1KBps
+  - JP006_389.6KBps
+  - DE001_NA
+  - IS001_297.4KBps
+  - HK002_100.0KBps
+  - HK003_232.5KBps
+- name: 📺 哔哩哔哩
+  type: select
+  proxies:
+  - DIRECT
+  - 🚀 节点选择
+  - DE002_251.9KBps
+  - DE003_888.1Bps
+  - US001_NA
+  - SG002_NA
+  - HK004_NA
+  - CA001_NA
+  - JP001_255.8KBps
+  - JP002_482.6KBps
+  - CN002_352.9KBps
+  - ES001_387.8KBps
+- name: 🌍 国外媒体
+  type: select
+  proxies:
+  - 🚀 节点选择
+  - ♻️ 自动选择
+  - 🔯 故障转移
+  - DIRECT
+  - DE002_251.9KBps
+  - DE003_888.1Bps
+  - US001_NA
+  - SG002_NA
+  - HK004_NA
+  - CA001_NA
+  - JP001_255.8KBps
+  - JP002_482.6KBps
+  - CN002_352.9KBps
+  - ES001_387.8KBps
+  - HK001_361.0KBps
+  - JP003_411.3KBps
+  - SG001_392.1KBps
+  - JP004_399.4KBps
+  - JP005_398.1KBps
+  - JP006_389.6KBps
+  - DE001_NA
+  - IS001_297.4KBps
+  - HK002_100.0KBps
+  - HK003_232.5KBps
+  - CL001_415.4KBps
+  - NL001_375.1KBps
+  - CN001_337.3KBps
+  - VN001_NA
+  - VN002_NA
+  - VN003_NA
+  - NL002_45.7KBps
+  - CN003_NA
+  - US002_1.0KBps
+- name: 🌏 国内媒体
+  type: select
+  proxies:
+  - DIRECT
+  - 🚀 节点选择
+  - DE002_251.9KBps
+  - DE003_888.1Bps
+  - US001_NA
+  - SG002_NA
+  - HK004_NA
+  - CA001_NA
+  - JP001_255.8KBps
+  - JP002_482.6KBps
+  - CN002_352.9KBps
+  - ES001_387.8KBps
+- name: 📢 谷歌FCM
+  type: select
+  proxies:
+  - 🚀 节点选择
+  - DIRECT
+  - DE002_251.9KBps
+  - DE003_888.1Bps
+  - US001_NA
+  - SG002_NA
+  - HK004_NA
+  - CA001_NA
+  - JP001_255.8KBps
+  - JP002_482.6KBps
+  - CN002_352.9KBps
+  - ES001_387.8KBps
+- name: Ⓜ️ 微软服务
+  type: select
+  proxies:
+  - DIRECT
+  - 🚀 节点选择
+  - DE002_251.9KBps
+  - DE003_888.1Bps
+  - US001_NA
+  - SG002_NA
+  - HK004_NA
+  - CA001_NA
+  - JP001_255.8KBps
+  - JP002_482.6KBps
+  - CN002_352.9KBps
+  - ES001_387.8KBps
+- name: 🍎 苹果服务
+  type: select
+  proxies:
+  - DIRECT
+  - 🚀 节点选择
+  - DE002_251.9KBps
+  - DE003_888.1Bps
+  - US001_NA
+  - SG002_NA
+  - HK004_NA
+  - CA001_NA
+  - JP001_255.8KBps
+  - JP002_482.6KBps
+  - CN002_352.9KBps
+  - ES001_387.8KBps
+- name: 🎮 游戏平台
+  type: select
+  proxies:
+  - DIRECT
+  - 🚀 节点选择
+  - DE002_251.9KBps
+  - DE003_888.1Bps
+  - US001_NA
+  - SG002_NA
+  - HK004_NA
+  - CA001_NA
+  - JP001_255.8KBps
+  - JP002_482.6KBps
+  - CN002_352.9KBps
+  - ES001_387.8KBps
+- name: 🛑 广告拦截
+  type: select
+  proxies:
+  - REJECT
+  - DIRECT
+- name: 🐟 漏网之鱼
+  type: select
+  proxies:
+  - 🚀 节点选择
+  - DIRECT
+  - DE002_251.9KBps
+  - DE003_888.1Bps
+  - US001_NA
+  - SG002_NA
+  - HK004_NA
+  - CA001_NA
+  - JP001_255.8KBps
+  - JP002_482.6KBps
+  - CN002_352.9KBps
+  - ES001_387.8KBps
+  - HK001_361.0KBps
+  - JP003_411.3KBps
+  - SG001_392.1KBps
+  - JP004_399.4KBps
+  - JP005_398.1KBps
+  - JP006_389.6KBps
+  - DE001_NA
+  - IS001_297.4KBps
+  - HK002_100.0KBps
+  - HK003_232.5KBps
+rules:
+- DOMAIN-SUFFIX,local,DIRECT
+- IP-CIDR,127.0.0.0/8,DIRECT
+- IP-CIDR,172.16.0.0/12,DIRECT
+- IP-CIDR,192.168.0.0/16,DIRECT
+- IP-CIDR,10.0.0.0/8,DIRECT
+- IP-CIDR,100.64.0.0/10,DIRECT
+- IP-CIDR,224.0.0.0/4,DIRECT
+- IP-CIDR,fe80::/10,DIRECT
+- IP-CIDR,119.28.28.28/32,DIRECT
+- IP-CIDR,182.254.116.0/24,DIRECT
+- DOMAIN-SUFFIX,googleadservices.com,🛑 广告拦截
+- DOMAIN-SUFFIX,googleadsserving.cn,🛑 广告拦截
+- DOMAIN-SUFFIX,googlesyndication.com,🛑 广告拦截
+- DOMAIN-SUFFIX,googletagmanager.com,🛑 广告拦截
+- DOMAIN-SUFFIX,google-analytics.com,🛑 广告拦截
+- DOMAIN-SUFFIX,amazon-adsystem.com,🛑 广告拦截
+- DOMAIN-SUFFIX,doubleclick.net,🛑 广告拦截
+- DOMAIN-SUFFIX,app-measurement.com,🛑 广告拦截
+- DOMAIN-SUFFIX,crashlytics.com,🛑 广告拦截
+- DOMAIN-SUFFIX,facebook.com,🛑 广告拦截
+- DOMAIN-SUFFIX,fbcdn.net,🛑 广告拦截
+- DOMAIN-KEYWORD,admarvel,🛑 广告拦截
+- DOMAIN-KEYWORD,admaster,🛑 广告拦截
+- DOMAIN-KEYWORD,adsage,🛑 广告拦截
+- DOMAIN-KEYWORD,adsmogo,🛑 广告拦截
+- DOMAIN-KEYWORD,adsrvmedia,🛑 广告拦截
+- DOMAIN-KEYWORD,adwords,🛑 广告拦截
+- DOMAIN-KEYWORD,adservice,🛑 广告拦截
+- DOMAIN-KEYWORD,domob,🛑 广告拦截
+- DOMAIN-KEYWORD,duomeng,🛑 广告拦截
+- DOMAIN-KEYWORD,dwtrack,🛑 广告拦截
+- DOMAIN-KEYWORD,guanggao,🛑 广告拦截
+- DOMAIN-KEYWORD,lianmeng,🛑 广告拦截
+- DOMAIN-KEYWORD,omgmta,🛑 广告拦截
+- DOMAIN-KEYWORD,openx,🛑 广告拦截
+- DOMAIN-KEYWORD,partnerad,🛑 广告拦截
+- DOMAIN-KEYWORD,pingfore,🛑 广告拦截
+- DOMAIN-KEYWORD,supersonicads,🛑 广告拦截
+- DOMAIN-KEYWORD,uedas,🛑 广告拦截
+- DOMAIN-KEYWORD,umeng,🛑 广告拦截
+- DOMAIN-KEYWORD,usage,🛑 广告拦截
+- DOMAIN-KEYWORD,wlmonitor,🛑 广告拦截
+- DOMAIN-KEYWORD,zjtoolbar,🛑 广告拦截
+- DOMAIN-KEYWORD,microsoft,Ⓜ️ 微软服务
+- DOMAIN-SUFFIX,windowsupdate.com,Ⓜ️ 微软服务
+- DOMAIN-SUFFIX,office.com,Ⓜ️ 微软服务
+- DOMAIN-SUFFIX,office365.com,Ⓜ️ 微软服务
+- DOMAIN-SUFFIX,sharepoint.com,Ⓜ️ 微软服务
+- DOMAIN-SUFFIX,skype.com,Ⓜ️ 微软服务
+- DOMAIN-SUFFIX,teams.com,Ⓜ️ 微软服务
+- DOMAIN-SUFFIX,windows.com,Ⓜ️ 微软服务
+- DOMAIN-SUFFIX,xbox.com,Ⓜ️ 微软服务
+- DOMAIN-SUFFIX,microsoftonline.com,Ⓜ️ 微软服务
+- DOMAIN-SUFFIX,outlook.com,Ⓜ️ 微软服务
+- DOMAIN-SUFFIX,hotmail.com,Ⓜ️ 微软服务
+- DOMAIN-SUFFIX,live.com,Ⓜ️ 微软服务
+- DOMAIN-SUFFIX,msn.com,Ⓜ️ 微软服务
+- DOMAIN-SUFFIX,bing.com,Ⓜ️ 微软服务
+- DOMAIN-SUFFIX,linkedin.com,Ⓜ️ 微软服务
+- DOMAIN-SUFFIX,apple.com,🍎 苹果服务
+- DOMAIN-SUFFIX,icloud.com,🍎 苹果服务
+- DOMAIN-SUFFIX,icloud-content.com,🍎 苹果服务
+- DOMAIN-SUFFIX,me.com,🍎 苹果服务
+- DOMAIN-SUFFIX,mzstatic.com,🍎 苹果服务
+- DOMAIN-SUFFIX,cdn-apple.com,🍎 苹果服务
+- DOMAIN-SUFFIX,apple-dns.net,🍎 苹果服务
+- DOMAIN-SUFFIX,appsto.re,🍎 苹果服务
+- DOMAIN-SUFFIX,itunes.com,🍎 苹果服务
+- DOMAIN-SUFFIX,apple.co,🍎 苹果服务
+- DOMAIN-SUFFIX,push-apple.com.akadns.net,🍎 苹果服务
+- DOMAIN-KEYWORD,google,📢 谷歌FCM
+- DOMAIN-SUFFIX,googleapis.com,📢 谷歌FCM
+- DOMAIN-SUFFIX,googlevideo.com,📢 谷歌FCM
+- DOMAIN-SUFFIX,gstatic.com,📢 谷歌FCM
+- DOMAIN-SUFFIX,ytimg.com,📢 谷歌FCM
+- DOMAIN-SUFFIX,youtube.com,📹 油管视频
+- DOMAIN-SUFFIX,googleusercontent.com,📢 谷歌FCM
+- DOMAIN-SUFFIX,gmail.com,📢 谷歌FCM
+- DOMAIN-SUFFIX,gvt2.com,📢 谷歌FCM
+- DOMAIN-SUFFIX,android.com,📢 谷歌FCM
+- DOMAIN-SUFFIX,xn--ngstr-lra8j.com,📢 谷歌FCM
+- DOMAIN-SUFFIX,googletagmanager.com,📢 谷歌FCM
+- DOMAIN-SUFFIX,googlesyndication.com,📢 谷歌FCM
+- DOMAIN-SUFFIX,googleadservices.com,📢 谷歌FCM
+- DOMAIN-SUFFIX,doubleclick.net,📢 谷歌FCM
+- DOMAIN-SUFFIX,netflix.com,🌍 国外媒体
+- DOMAIN-SUFFIX,netflix.net,🌍 国外媒体
+- DOMAIN-SUFFIX,nflxext.com,🌍 国外媒体
+- DOMAIN-SUFFIX,nflximg.com,🌍 国外媒体
+- DOMAIN-SUFFIX,nflximg.net,🌍 国外媒体
+- DOMAIN-SUFFIX,nflxso.net,🌍 国外媒体
+- DOMAIN-SUFFIX,nflxvideo.net,🌍 国外媒体
+- DOMAIN-KEYWORD,netflix,🌍 国外媒体
+- DOMAIN-KEYWORD,nflx,🌍 国外媒体
+- DOMAIN-SUFFIX,bahamut.com.tw,🌍 国外媒体
+- DOMAIN-SUFFIX,gamer.com.tw,🌍 国外媒体
+- DOMAIN-KEYWORD,bahamut,🌍 国外媒体
+- DOMAIN-SUFFIX,bilibili.com,🌍 国外媒体
+- DOMAIN-SUFFIX,biliapi.com,🌍 国外媒体
+- DOMAIN-SUFFIX,biliapi.net,🌍 国外媒体
+- DOMAIN-SUFFIX,bilivideo.com,🌍 国外媒体
+- DOMAIN-SUFFIX,acg.tv,🌍 国外媒体
+- DOMAIN-SUFFIX,acgvideo.com,🌍 国外媒体
+- DOMAIN-KEYWORD,spotify,🌍 国外媒体
+- DOMAIN-KEYWORD,hulu,🌍 国外媒体
+- DOMAIN-SUFFIX,twitch.tv,🌍 国外媒体
+- DOMAIN-SUFFIX,disney.com,🌍 国外媒体
+- DOMAIN-SUFFIX,disneyplus.com,🌍 国外媒体
+- DOMAIN-SUFFIX,hbomax.com,🌍 国外媒体
+- DOMAIN-SUFFIX,primevideo.com,🌍 国外媒体
+- DOMAIN-SUFFIX,hbo.com,🌍 国外媒体
+- DOMAIN-SUFFIX,hbogo.com,🌍 国外媒体
+- DOMAIN-SUFFIX,hbonow.com,🌍 国外媒体
+- DOMAIN-SUFFIX,amazon.com,🌍 国外媒体
+- DOMAIN-SUFFIX,amazon.co.jp,🌍 国外媒体
+- DOMAIN-SUFFIX,amazon.co.uk,🌍 国外媒体
+- DOMAIN-SUFFIX,amazon.de,🌍 国外媒体
+- DOMAIN-SUFFIX,abema.io,🌍 国外媒体
+- DOMAIN-SUFFIX,abema.tv,🌍 国外媒体
+- DOMAIN-SUFFIX,dmm.co.jp,🌍 国外媒体
+- DOMAIN-SUFFIX,dmm.com,🌍 国外媒体
+- DOMAIN-SUFFIX,viu.com,🌍 国外媒体
+- DOMAIN-SUFFIX,viu.tv,🌍 国外媒体
+- DOMAIN-KEYWORD,bbc,🌍 国外媒体
+- DOMAIN-SUFFIX,bbci.co.uk,🌍 国外媒体
+- DOMAIN-SUFFIX,iqiyi.com,🎯 全球直连
+- DOMAIN-SUFFIX,iqiyipic.com,🎯 全球直连
+- DOMAIN-SUFFIX,qy.net,🎯 全球直连
+- DOMAIN-SUFFIX,youku.com,🎯 全球直连
+- DOMAIN-SUFFIX,tudou.com,🎯 全球直连
+- DOMAIN-SUFFIX,mgtv.com,🎯 全球直连
+- DOMAIN-SUFFIX,le.com,🎯 全球直连
+- DOMAIN-SUFFIX,sohu.com,🎯 全球直连
+- DOMAIN-SUFFIX,sohu.tv,🎯 全球直连
+- DOMAIN-SUFFIX,letv.com,🎯 全球直连
+- DOMAIN-SUFFIX,letvcloud.com,🎯 全球直连
+- DOMAIN-SUFFIX,cctv.com,🎯 全球直连
+- DOMAIN-SUFFIX,cntv.cn,🎯 全球直连
+- DOMAIN-SUFFIX,miguvideo.com,🎯 全球直连
+- DOMAIN-SUFFIX,steamcommunity.com,🎯 全球直连
+- DOMAIN-SUFFIX,steampowered.com,🎯 全球直连
+- DOMAIN-SUFFIX,steamstatic.com,🎯 全球直连
+- DOMAIN-SUFFIX,steam-chat.com,🎯 全球直连
+- DOMAIN-SUFFIX,steamgames.com,🎯 全球直连
+- DOMAIN-SUFFIX,steamusercontent.com,🎯 全球直连
+- DOMAIN-SUFFIX,epicgames.com,🎯 全球直连
+- DOMAIN-SUFFIX,epicgames.dev,🎯 全球直连
+- DOMAIN-SUFFIX,unrealengine.com,🎯 全球直连
+- DOMAIN-SUFFIX,playstation.com,🎯 全球直连
+- DOMAIN-SUFFIX,playstation.net,🎯 全球直连
+- DOMAIN-SUFFIX,playstationnetwork.com,🎯 全球直连
+- DOMAIN-SUFFIX,xboxlive.com,🎯 全球直连
+- DOMAIN-SUFFIX,nintendo.com,🎯 全球直连
+- DOMAIN-SUFFIX,nintendo.net,🎯 全球直连
+- DOMAIN-SUFFIX,telegram.org,🌍 国外媒体
+- DOMAIN-SUFFIX,telegram.me,🌍 国外媒体
+- DOMAIN-SUFFIX,tdesktop.com,🌍 国外媒体
+- DOMAIN-SUFFIX,telegra.ph,🌍 国外媒体
+- IP-CIDR,91.108.4.0/22,🌍 国外媒体
+- IP-CIDR,91.108.8.0/22,🌍 国外媒体
+- IP-CIDR,91.108.12.0/22,🌍 国外媒体
+- IP-CIDR,91.108.16.0/22,🌍 国外媒体
+- IP-CIDR,91.108.56.0/22,🌍 国外媒体
+- IP-CIDR,149.154.160.0/20,🌍 国外媒体
+- IP-CIDR,2001:b28:f23d::/48,🌍 国外媒体
+- IP-CIDR,2001:b28:f23f::/48,🌍 国外媒体
+- IP-CIDR,2001:67c:4e8::/48,🌍 国外媒体
+- DOMAIN-KEYWORD,twitter,🌍 国外媒体
+- DOMAIN-SUFFIX,twitter.com,🌍 国外媒体
+- DOMAIN-SUFFIX,twimg.com,🌍 国外媒体
+- DOMAIN-SUFFIX,t.co,🌍 国外媒体
+- DOMAIN-SUFFIX,x.com,🌍 国外媒体
+- DOMAIN-KEYWORD,facebook,🌍 国外媒体
+- DOMAIN-SUFFIX,facebook.com,🌍 国外媒体
+- DOMAIN-SUFFIX,fb.com,🌍 国外媒体
+- DOMAIN-SUFFIX,fbcdn.net,🌍 国外媒体
+- DOMAIN-SUFFIX,instagram.com,🌍 国外媒体
+- DOMAIN-SUFFIX,whatsapp.com,🌍 国外媒体
+- DOMAIN-SUFFIX,whatsapp.net,🌍 国外媒体
+- DOMAIN-KEYWORD,github,🌍 国外媒体
+- DOMAIN-SUFFIX,github.com,🌍 国外媒体
+- DOMAIN-SUFFIX,github.io,🌍 国外媒体
+- DOMAIN-SUFFIX,githubassets.com,🌍 国外媒体
+- DOMAIN-SUFFIX,githubusercontent.com,🌍 国外媒体
+- DOMAIN-SUFFIX,git.io,🌍 国外媒体
+- DOMAIN-KEYWORD,alipay,🎯 全球直连
+- DOMAIN-KEYWORD,taobao,🎯 全球直连
+- DOMAIN-KEYWORD,alicdn,🎯 全球直连
+- DOMAIN-SUFFIX,cn,🎯 全球直连
+- DOMAIN-SUFFIX,baidu.com,🎯 全球直连
+- DOMAIN-SUFFIX,baidubce.com,🎯 全球直连
+- DOMAIN-SUFFIX,baidupan.com,🎯 全球直连
+- DOMAIN-SUFFIX,bdstatic.com,🎯 全球直连
+- DOMAIN-SUFFIX,weibo.com,🎯 全球直连
+- DOMAIN-SUFFIX,weibo.cn,🎯 全球直连
+- DOMAIN-SUFFIX,qq.com,🎯 全球直连
+- DOMAIN-SUFFIX,tencent.com,🎯 全球直连
+- DOMAIN-SUFFIX,tencent-cloud.com,🎯 全球直连
+- DOMAIN-SUFFIX,gtimg.com,🎯 全球直连
+- DOMAIN-SUFFIX,qpic.cn,🎯 全球直连
+- DOMAIN-SUFFIX,qcloud.com,🎯 全球直连
+- DOMAIN-SUFFIX,myqcloud.com,🎯 全球直连
+- DOMAIN-SUFFIX,aliyun.com,🎯 全球直连
+- DOMAIN-SUFFIX,alicdn.com,🎯 全球直连
+- DOMAIN-SUFFIX,alibaba.com,🎯 全球直连
+- DOMAIN-SUFFIX,alipay.com,🎯 全球直连
+- DOMAIN-SUFFIX,taobao.com,🎯 全球直连
+- DOMAIN-SUFFIX,tmall.com,🎯 全球直连
+- DOMAIN-SUFFIX,jd.com,🎯 全球直连
+- DOMAIN-SUFFIX,360.cn,🎯 全球直连
+- DOMAIN-SUFFIX,360safe.com,🎯 全球直连
+- DOMAIN-SUFFIX,360.com,🎯 全球直连
+- DOMAIN-SUFFIX,36kr.com,🎯 全球直连
+- DOMAIN-SUFFIX,126.com,🎯 全球直连
+- DOMAIN-SUFFIX,126.net,🎯 全球直连
+- DOMAIN-SUFFIX,163.com,🎯 全球直连
+- DOMAIN-SUFFIX,163yun.com,🎯 全球直连
+- DOMAIN-SUFFIX,netease.com,🎯 全球直连
+- DOMAIN-SUFFIX,126.net,🎯 全球直连
+- DOMAIN-SUFFIX,dingtalk.com,🎯 全球直连
+- DOMAIN-SUFFIX,bytedance.com,🎯 全球直连
+- DOMAIN-SUFFIX,byteimg.com,🎯 全球直连
+- DOMAIN-SUFFIX,toutiao.com,🎯 全球直连
+- DOMAIN-SUFFIX,snssdk.com,🎯 全球直连
+- DOMAIN-SUFFIX,pglstatp-toutiao.com,🎯 全球直连
+- DOMAIN-SUFFIX,csdn.net,🎯 全球直连
+- DOMAIN-SUFFIX,oschina.net,🎯 全球直连
+- DOMAIN-SUFFIX,gitee.com,🎯 全球直连
+- DOMAIN-SUFFIX,coding.net,🎯 全球直连
+- DOMAIN-SUFFIX,segmentfault.com,🎯 全球直连
+- DOMAIN-SUFFIX,jianshu.com,🎯 全球直连
+- DOMAIN-SUFFIX,zhihu.com,🎯 全球直连
+- DOMAIN-SUFFIX,douban.com,🎯 全球直连
+- DOMAIN-SUFFIX,doubanio.com,🎯 全球直连
+- DOMAIN-SUFFIX,v2ex.com,🎯 全球直连
+- DOMAIN-SUFFIX,hostloc.com,🎯 全球直连
+- DOMAIN-SUFFIX,smzdm.com,🎯 全球直连
+- DOMAIN-SUFFIX,meituan.com,🎯 全球直连
+- DOMAIN-SUFFIX,meituan.net,🎯 全球直连
+- DOMAIN-SUFFIX,dianping.com,🎯 全球直连
+- DOMAIN-SUFFIX,xiaohongshu.com,🎯 全球直连
+- DOMAIN-SUFFIX,xhscdn.com,🎯 全球直连
+- DOMAIN-SUFFIX,douyin.com,🎯 全球直连
+- DOMAIN-SUFFIX,iesdouyin.com,🎯 全球直连
+- DOMAIN-SUFFIX,kuaishou.com,🎯 全球直连
+- DOMAIN-SUFFIX,ksyun.com,🎯 全球直连
+- DOMAIN-SUFFIX,ks-cdn.com,🎯 全球直连
+- DOMAIN-SUFFIX,ksyunad.com,🎯 全球直连
+- DOMAIN-SUFFIX,amap.com,🎯 全球直连
+- DOMAIN-SUFFIX,autonavi.com,🎯 全球直连
+- DOMAIN-SUFFIX,gaode.com,🎯 全球直连
+- DOMAIN-SUFFIX,mob.com,🎯 全球直连
+- DOMAIN-SUFFIX,getui.com,🎯 全球直连
+- DOMAIN-SUFFIX,umeng.com,🎯 全球直连
+- DOMAIN-SUFFIX,umengcloud.com,🎯 全球直连
+- DOMAIN-SUFFIX,umeng.co,🎯 全球直连
+- DOMAIN-SUFFIX,umsns.com,🎯 全球直连
+- DOMAIN-SUFFIX,unionpay.com,🎯 全球直连
+- DOMAIN-SUFFIX,unionpaysecure.com,🎯 全球直连
+- DOMAIN-SUFFIX,95516.com,🎯 全球直连
+- DOMAIN-SUFFIX,ccb.com,🎯 全球直连
+- DOMAIN-SUFFIX,icbc.com.cn,🎯 全球直连
+- DOMAIN-SUFFIX,boc.cn,🎯 全球直连
+- DOMAIN-SUFFIX,abchina.com,🎯 全球直连
+- DOMAIN-SUFFIX,bankcomm.com,🎯 全球直连
+- DOMAIN-SUFFIX,cmbchina.com,🎯 全球直连
+- DOMAIN-SUFFIX,cmbimg.com,🎯 全球直连
+- DOMAIN-SUFFIX,pingan.com,🎯 全球直连
+- DOMAIN-SUFFIX,pingan.com.cn,🎯 全球直连
+- DOMAIN-SUFFIX,zhongan.com,🎯 全球直连
+- DOMAIN-SUFFIX,zhonganonline.com,🎯 全球直连
+- GEOIP,CN,🎯 全球直连
+- MATCH,🐟 漏网之鱼
