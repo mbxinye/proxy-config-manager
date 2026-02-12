@@ -21,6 +21,8 @@ def sanitize_name(name: str) -> str:
 
     sanitized = name.encode("ascii", "ignore").decode("ascii")
 
+    sanitized = "".join(c for c in sanitized if 32 <= ord(c) <= 126)
+
     invalid_chars = [
         ":",
         "{",
