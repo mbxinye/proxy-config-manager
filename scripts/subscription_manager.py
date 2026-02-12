@@ -294,6 +294,7 @@ class SubscriptionManager:
 
     def select_subscriptions(self) -> List[str]:
         """智能选择今天要处理的订阅"""
+        random.seed(datetime.now().date().toordinal())
         selected = []
 
         for sub in self.db["subscriptions"]:

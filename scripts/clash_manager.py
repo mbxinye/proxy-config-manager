@@ -125,14 +125,14 @@ class ClashManager:
         """停止Clash进程"""
         if self.process:
             try:
-                # 尝试优雅退出
-                os.killpg(os.getpgid(self.process.pid), signal.SIGTERM)
+                pgid = os.getpgid(self.process.pid)
+                os.killpg(pgid, signal.SIGTERM)
                 self.process.wait(timeout=2)
-            except (ProcessLookupError, subprocess.TimeoutExpired):
+            except (ProcessLookupError, subprocess.TimeoutExpired, PermissionError):
                 try:
-                    # 强制杀死
-                    os.killpg(os.getpgid(self.process.pid), signal.SIGKILL)
-                except Exception:
+                    pgid = os.getpgid(self.process.pid)
+                    os.killpg(pgid, signal.SIGKILL)
+                except (ProcessLookupError, PermissionError):
                     pass
             except Exception as e:
                 self.log(f"  ⚠️ 停止Clash出错: {e}")

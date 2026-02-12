@@ -43,6 +43,13 @@ PROTOCOL_PRIORITY = {
     "http": 10,
 }
 
+IP_LOOKUP_SEMAPHORE_LIMIT = 50
+CLASH_TEST_SEMAPHORE_LIMIT = 50
+UNLOCK_TEST_LIMIT = 50
+UNLOCK_WORKER_COUNT = 3
+UNLOCK_BASE_PORT_OFFSET = 200
+UNLOCK_PORT_MULTIPLIER = 100
+
 
 class Validator:
     def __init__(self, verbose: bool = True):
@@ -174,7 +181,7 @@ class Validator:
             ip_tasks.setdefault(ip, []).append(i)
 
         if ip_tasks:
-            semaphore = asyncio.Semaphore(50)
+            semaphore = asyncio.Semaphore(IP_LOOKUP_SEMAPHORE_LIMIT)
 
             async def query_with_semaphore(ip: str):
                 async with semaphore:
@@ -210,10 +217,9 @@ class Validator:
         
         for node in unique_nodes:
             sub_url = node.get("_sub_url")
-            if sub_url and sub_url not in sub_stats:
-                sub_stats[sub_url] = {"total": 0, "valid": 0, "latencies": []}
-            
             if sub_url:
+                if sub_url not in sub_stats:
+                    sub_stats[sub_url] = {"total": 0, "valid": 0, "latencies": []}
                 sub_stats[sub_url]["total"] += 1
 
         for node in valid_nodes:
@@ -221,7 +227,7 @@ class Validator:
             latency = node.get("clash_delay", node.get("tcp_latency", 9999))
             if sub_url:
                 if sub_url not in sub_stats:
-                     sub_stats[sub_url] = {"total": 0, "valid": 0, "latencies": []}
+                    sub_stats[sub_url] = {"total": 0, "valid": 0, "latencies": []}
                 sub_stats[sub_url]["valid"] += 1
                 sub_stats[sub_url]["latencies"].append(latency)
 
@@ -330,7 +336,7 @@ class Validator:
         proxies = await self.clash.get_proxies()
         print(f"  正在测试 {len(proxies)} 个代理 (并发)...")
         
-        semaphore = asyncio.Semaphore(50)
+        semaphore = asyncio.Semaphore(CLASH_TEST_SEMAPHORE_LIMIT)
         
         async def test_wrapper(name):
             async with semaphore:
@@ -360,22 +366,22 @@ class Validator:
         print("\n🔓 阶段3: 解锁能力测试...")
         
         if Config.UNLOCK_TEST_ENABLED and clash_passed_nodes:
-            test_limit = min(len(clash_passed_nodes), 50)
+            test_limit = min(len(clash_passed_nodes), UNLOCK_TEST_LIMIT)
             nodes_to_test = clash_passed_nodes[:test_limit]
             
             print(f"  并行测试前 {len(nodes_to_test)} 个节点...")
             
-            num_workers = min(3, len(nodes_to_test))
+            num_workers = min(UNLOCK_WORKER_COUNT, len(nodes_to_test))
             chunk_size = (len(nodes_to_test) + num_workers - 1) // num_workers
             
-            process_offset = (os.getpid() % 1000) * 100
+            process_offset = (os.getpid() % 1000) * UNLOCK_PORT_MULTIPLIER
             random_offset = random.randint(1, 50)
             
             async def test_node_batch(worker_id: int, nodes_batch: List[Dict], base_port: int):
                 if not nodes_batch:
                     return
                 
-                worker_port = base_port + worker_id * 100 + random_offset
+                worker_port = base_port + worker_id * UNLOCK_PORT_MULTIPLIER + random_offset
                 mixed_port = worker_port
                 api_port = worker_port + 1
                 socks_port = worker_port + 2
@@ -437,7 +443,7 @@ class Validator:
                     worker_clash.stop()
             
             batches = [nodes_to_test[i:i+chunk_size] for i in range(0, len(nodes_to_test), chunk_size)]
-            unlock_base_port = Config.CLASH_MIXED_PORT + 200 + process_offset
+            unlock_base_port = Config.CLASH_MIXED_PORT + UNLOCK_BASE_PORT_OFFSET + process_offset
             tasks = [test_node_batch(i, batch, unlock_base_port) for i, batch in enumerate(batches)]
             await asyncio.gather(*tasks)
             

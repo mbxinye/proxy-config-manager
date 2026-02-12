@@ -58,20 +58,17 @@ class NodeParser:
     def _try_base64_decode(self, content: str) -> Optional[str]:
         """尝试Base64解码，如果失败返回None"""
         try:
-            # 处理可能的URL编码
             if "%" in content:
                 try:
                     content = urllib.parse.unquote(content)
-                except:
+                except Exception:
                     pass
             
-            # 处理padding
-            padding = 4 - len(content) % 4
-            if padding < 4:
-                content += "=" * padding
+            padding = len(content) % 4
+            if padding > 0:
+                content += "=" * (4 - padding)
                 
             decoded = base64.b64decode(content).decode("utf-8", errors="ignore")
-            # 简单验证解码后是否看起来像文本
             if decoded and len(decoded) > len(content) / 2:
                 return decoded
         except Exception:
@@ -217,7 +214,7 @@ class NodeParser:
                 "tls": config.get("tls", ""),
                 "raw": url,
             }
-        except:
+        except Exception:
             return None
 
     def parse_trojan(self, url: str) -> Optional[Dict]:
@@ -242,7 +239,7 @@ class NodeParser:
                 "skip-cert-verify": query.get("allowInsecure", ["0"])[0] == "1",
                 "raw": url,
             }
-        except:
+        except Exception:
             return None
 
     def parse_vless(self, url: str) -> Optional[Dict]:
@@ -277,7 +274,7 @@ class NodeParser:
                 node["fingerprint"] = query.get("fp", ["chrome"])[0]
                 
             return node
-        except:
+        except Exception:
             return None
 
     def parse_hysteria2(self, url: str) -> Optional[Dict]:
@@ -301,5 +298,5 @@ class NodeParser:
                 "sni": query.get("sni", [None])[0],
                 "raw": url,
             }
-        except:
+        except Exception:
             return None

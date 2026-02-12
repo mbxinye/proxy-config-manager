@@ -12,9 +12,11 @@
 import asyncio
 import json
 import os
+import socket
+import subprocess
 import sys
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 SUBS_DIR = Path("subscriptions")
 OUTPUT_DIR = Path("output")
@@ -31,8 +33,6 @@ def ensure_dirs():
 
 def init_subscriptions():
     print("📦 初始化订阅...")
-    import subprocess
-
     subprocess.run(
         [sys.executable, "scripts/subscription_manager.py", "init"], capture_output=True
     )
@@ -40,8 +40,6 @@ def init_subscriptions():
 
 def select_subscriptions():
     print("🎯 选择订阅...")
-    import subprocess
-
     result = subprocess.run(
         [sys.executable, "scripts/subscription_manager.py", "select"],
         capture_output=True,
@@ -54,8 +52,6 @@ def select_subscriptions():
 
 def fetch_subscriptions():
     print("📥 获取订阅...")
-    import subprocess
-
     subprocess.run(
         [sys.executable, "scripts/subscription_manager.py", "fetch"],
         capture_output=True,
@@ -64,15 +60,11 @@ def fetch_subscriptions():
 
 def validate_nodes():
     print("🔍 测试节点...")
-    import subprocess
-
     subprocess.run([sys.executable, "-m", "scripts.validator"], capture_output=False)
 
 
 def update_scores():
     print("📊 更新评分...")
-    import subprocess
-
     subprocess.run(
         [sys.executable, "scripts/subscription_manager.py", "update-scores"],
         capture_output=True,
@@ -81,8 +73,6 @@ def update_scores():
 
 def generate_clash_config():
     print("📝 生成配置...")
-    import subprocess
-
     subprocess.run(
         [sys.executable, "scripts/clash_generator.py", "generate"], capture_output=True
     )
@@ -90,8 +80,6 @@ def generate_clash_config():
 
 def generate_report():
     print("📄 生成报告...")
-    import subprocess
-
     subprocess.run(
         [sys.executable, "scripts/subscription_manager.py", "report"],
         capture_output=True,
@@ -127,8 +115,6 @@ def run_full_pipeline(mode="local"):
 
 async def test_single_node(node_info):
     """测试单个节点（供诊断使用）"""
-    import socket
-
     node_type = node_info.get("type", "")
     server = node_info.get("server", "")
     port = node_info.get("port", 0)
@@ -139,9 +125,10 @@ async def test_single_node(node_info):
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(5)
-        start = asyncio.get_event_loop().time()
-        await asyncio.get_event_loop().sock_connect(sock, (server, port))
-        latency = (asyncio.get_event_loop().time() - start) * 1000
+        loop = asyncio.get_event_loop()
+        start = loop.time()
+        await loop.sock_connect(sock, (server, port))
+        latency = (loop.time() - start) * 1000
         sock.close()
         return True, int(latency), "连接成功"
     except Exception as e:
