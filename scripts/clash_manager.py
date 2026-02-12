@@ -247,6 +247,9 @@ class ClashManager:
             elif t == "vmess":
                 if not n.get("uuid"):
                     continue
+                uuid_val = n.get("uuid", "")
+                if "%" in uuid_val:
+                    uuid_val = urllib.parse.unquote(uuid_val)
                 ws_headers = {}
                 if n.get("host"):
                     ws_headers["Host"] = n.get("host")
@@ -260,7 +263,7 @@ class ClashManager:
                     "type": "vmess",
                     "server": n.get("server"),
                     "port": int(n.get("port", 443)),
-                    "uuid": n.get("uuid", ""),
+                    "uuid": uuid_val,
                     "alterId": int(n.get("alterId", 0)),
                     "cipher": n.get("security", "auto"),
                     "udp": True,
@@ -275,6 +278,9 @@ class ClashManager:
             elif t == "trojan":
                 if not n.get("password"):
                     continue
+                password_val = n.get("password", "")
+                if "%" in password_val:
+                    password_val = urllib.parse.unquote(password_val)
                 ws_headers = {}
                 if n.get("host"):
                     ws_headers["Host"] = n.get("host")
@@ -288,7 +294,7 @@ class ClashManager:
                     "type": "trojan",
                     "server": n.get("server"),
                     "port": int(n.get("port", 443)),
-                    "password": n.get("password", ""),
+                    "password": password_val,
                     "udp": True,
                     **({"sni": n.get("sni")} if n.get("sni") else {}),
                     **({"skip-cert-verify": bool(n.get("skip-cert-verify"))} if "skip-cert-verify" in n else {}),
@@ -301,12 +307,15 @@ class ClashManager:
                     continue
                 if not n.get("uuid"):
                     continue
+                uuid_val = n.get("uuid", "")
+                if "%" in uuid_val:
+                    uuid_val = urllib.parse.unquote(uuid_val)
                 base = {
                     "name": n.get("name"),
                     "type": "vless",
                     "server": n.get("server"),
                     "port": int(n.get("port", 443)),
-                    "uuid": n.get("uuid", ""),
+                    "uuid": uuid_val,
                     "udp": True
                 }
                 if n.get("sni"):
