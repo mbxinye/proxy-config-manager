@@ -308,14 +308,17 @@ class Validator:
 
         print("\n⚡ 阶段2: Clash延迟测试 (被墙服务)...")
         
-        name_counts = {}
+        used_names = set()
         for node in tcp_passed_nodes:
             base_name = sanitize_name(node["name"])
-            if base_name in name_counts:
-                name_counts[base_name] += 1
-                node["name"] = f"{base_name}_{name_counts[base_name]}"
+            if base_name in used_names:
+                counter = 2
+                while f"{base_name}_{counter}" in used_names:
+                    counter += 1
+                node["name"] = f"{base_name}_{counter}"
+                used_names.add(node["name"])
             else:
-                name_counts[base_name] = 1
+                used_names.add(base_name)
                 node["name"] = base_name
 
         config_path = self.output_dir / "clash_validator.yml"
