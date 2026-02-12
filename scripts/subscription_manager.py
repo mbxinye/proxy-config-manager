@@ -12,7 +12,12 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List, Optional
 
-from config import Config
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+try:
+    from config import Config
+except ImportError:
+    from scripts.config import Config
 
 
 class SubscriptionManager:
@@ -75,54 +80,88 @@ class SubscriptionManager:
     def calculate_score(self, sub: Dict) -> int:
         """
         计算订阅评分（0-100）
-        维度：成功率(35%)、节点质量(25%)、稳定性(20%)、趋势(15%)、更新频率(5%)
+        新维度：连通性(40%)、解锁能力(35%)、延迟(15%)、稳定性(10%)
         """
         if sub.get("use_count", 0) < 3:
-            # 新订阅，给予初始分数75，鼓励测试
             return 75
 
         history = sub.get("history", [])
         if len(history) < 2:
-            # 数据不足，基于现有数据简单评分
             return self._calculate_basic_score(sub)
 
-        # 成功率评分（35分）- 基于最近10次记录
-        success_rate = sub.get("success_rate", 0.5)
-        success_score = success_rate * 35
+        connectivity_score = self._calculate_connectivity_score(sub)
 
-        # 节点质量评分（25分）- 基于平均延迟
-        avg_latency = sub.get("avg_latency", 500)
-        if avg_latency < 100:
-            quality_score = 25
-        elif avg_latency < 200:
-            quality_score = 22
-        elif avg_latency < 400:
-            quality_score = 18
-        elif avg_latency < 600:
-            quality_score = 12
-        else:
-            quality_score = 8
+        unlock_score = self._calculate_unlock_score(sub)
 
-        # 稳定性评分（20分）- 基于节点数量波动和生存时长
-        stability_score = self._calculate_stability_score(history)
+        latency_score = self._calculate_latency_score(sub)
 
-        # 趋势评分（15分）- 成功率是上升还是下降
-        trend_score = self._calculate_trend_score(history)
-
-        # 更新频率评分（5分）- 实际检测订阅是否持续更新
-        update_score = self._calculate_update_score(sub)
+        stability_score = self._calculate_stability_score_lite(history)
 
         total_score = (
-            success_score + quality_score + stability_score + trend_score + update_score
+            connectivity_score + unlock_score + latency_score + stability_score
         )
         return min(100, max(0, int(total_score)))
+
+    def _calculate_connectivity_score(self, sub: Dict) -> int:
+        """连通性评分（40分）- 基于成功率"""
+        success_rate = sub.get("success_rate", 0.5)
+        return success_rate * 40
+
+    def _calculate_unlock_score(self, sub: Dict) -> int:
+        """解锁能力评分（35分）- 基于历史解锁表现"""
+        history = sub.get("history", [])
+        if not history:
+            return 17
+        
+        recent = history[-5:]
+        valid_count = sum(1 for h in recent if h.get("valid_nodes", 0) > 0)
+        
+        if valid_count >= 5:
+            return 35
+        elif valid_count >= 4:
+            return 30
+        elif valid_count >= 3:
+            return 25
+        elif valid_count >= 2:
+            return 18
+        elif valid_count >= 1:
+            return 10
+        else:
+            return 0
+
+    def _calculate_latency_score(self, sub: Dict) -> int:
+        """延迟评分（15分）"""
+        avg_latency = sub.get("avg_latency", 500)
+        if avg_latency < 100:
+            return 15
+        elif avg_latency < 200:
+            return 13
+        elif avg_latency < 400:
+            return 10
+        elif avg_latency < 600:
+            return 7
+        elif avg_latency < 1000:
+            return 4
+        else:
+            return 2
+
+    def _calculate_stability_score_lite(self, history: List[Dict]) -> int:
+        """简化稳定性评分（10分）"""
+        if len(history) < 2:
+            return 5
+
+        valid_counts = [h.get("valid_nodes", 0) for h in history[-5:]]
+        if not valid_counts:
+            return 5
+
+        has_valid = sum(1 for v in valid_counts if v > 0)
+        return min(10, has_valid * 2)
 
     def _calculate_basic_score(self, sub: Dict) -> int:
         """数据不足时的基础评分"""
         success_rate = sub.get("success_rate", 0.5)
         avg_latency = sub.get("avg_latency", 500)
 
-        # 基础分50 + 成功率加成 + 延迟加成
         score = 50
         score += success_rate * 30
         if avg_latency < 300:
@@ -131,143 +170,6 @@ class SubscriptionManager:
             score += 10
 
         return min(90, max(30, int(score)))
-
-    def _calculate_stability_score(self, history: List[Dict]) -> int:
-        """
-        计算稳定性评分（20分）
-        - 节点数量波动小得分高
-        - 节点生存时长长得分高
-        """
-        if not history or len(history) < 2:
-            return 10
-
-        # 计算节点数量波动（标准差）
-        total_nodes_list = [h.get("total_nodes", 0) for h in history]
-        avg_nodes = sum(total_nodes_list) / len(total_nodes_list)
-
-        if len(total_nodes_list) > 1:
-            variance = sum((n - avg_nodes) ** 2 for n in total_nodes_list) / len(
-                total_nodes_list
-            )
-            std_dev = variance**0.5
-        else:
-            std_dev = 0
-
-        # 波动越小得分越高（10分）
-        if std_dev < 2:
-            variance_score = 10
-        elif std_dev < 5:
-            variance_score = 8
-        elif std_dev < 10:
-            variance_score = 6
-        elif std_dev < 15:
-            variance_score = 4
-        else:
-            variance_score = 2
-
-        # 生存时长评分（10分）- 基于历史记录覆盖的时间跨度
-        try:
-            if len(history) >= 2:
-                first_date = datetime.fromisoformat(history[0].get("date", ""))
-                last_date = datetime.fromisoformat(history[-1].get("date", ""))
-                days_span = (last_date - first_date).days
-
-                if days_span >= 30:
-                    longevity_score = 10
-                elif days_span >= 14:
-                    longevity_score = 8
-                elif days_span >= 7:
-                    longevity_score = 6
-                elif days_span >= 3:
-                    longevity_score = 4
-                else:
-                    longevity_score = 2
-            else:
-                longevity_score = 5
-        except Exception:
-            longevity_score = 5
-
-        return variance_score + longevity_score
-
-    def _calculate_trend_score(self, history: List[Dict]) -> int:
-        """
-        计算趋势评分（15分）
-        - 最近成功率相比早期是上升还是下降
-        - 延迟趋势
-        """
-        if len(history) < 3:
-            return 10  # 数据不足，给中等分数
-
-        # 分两半比较
-        half = len(history) // 2
-        early_records = history[:half]
-        recent_records = history[half:]
-
-        # 计算早期和近期的平均成功率
-        early_success = sum(h.get("valid_nodes", 0) for h in early_records) / max(
-            sum(h.get("total_nodes", 1) for h in early_records), 1
-        )
-        recent_success = sum(h.get("valid_nodes", 0) for h in recent_records) / max(
-            sum(h.get("total_nodes", 1) for h in recent_records), 1
-        )
-
-        # 趋势得分（10分）
-        if recent_success > early_success + 0.1:
-            trend_score = 10  # 显著提升
-        elif recent_success > early_success:
-            trend_score = 8  # 略有提升
-        elif recent_success > early_success - 0.1:
-            trend_score = 6  # 基本持平
-        else:
-            trend_score = 3  # 下降趋势
-
-        # 延迟趋势（5分）- 最近是否改善
-        early_latency = [
-            h.get("avg_latency", 999)
-            for h in early_records
-            if h.get("avg_latency", 999) < 9999
-        ]
-        recent_latency = [
-            h.get("avg_latency", 999)
-            for h in recent_records
-            if h.get("avg_latency", 999) < 9999
-        ]
-
-        if early_latency and recent_latency:
-            avg_early = sum(early_latency) / len(early_latency)
-            avg_recent = sum(recent_latency) / len(recent_latency)
-
-            if avg_recent < avg_early * 0.8:
-                latency_trend_score = 5  # 显著改善
-            elif avg_recent < avg_early:
-                latency_trend_score = 3  # 略有改善
-            else:
-                latency_trend_score = 1  # 恶化
-        else:
-            latency_trend_score = 3
-
-        return trend_score + latency_trend_score
-
-    def _calculate_update_score(self, sub: Dict) -> int:
-        """
-        计算更新频率评分（5分）
-        - 检测订阅是否持续更新（有内容变化）
-        """
-        history = sub.get("history", [])
-        if len(history) < 2:
-            return 3  # 数据不足
-
-        # 检查最近记录中节点数量是否有变化（说明订阅内容有更新）
-        recent_total_nodes = [h.get("total_nodes", 0) for h in history[-5:]]
-        if len(set(recent_total_nodes)) > 1:
-            return 5  # 有变化，说明在更新
-
-        # 检查使用频率，如果经常被使用但节点数不变，可能订阅源已停滞
-        use_count = sub.get("use_count", 0)
-        if use_count > 10 and len(set(recent_total_nodes)) == 1:
-            return 2  # 长期使用但无变化，可能停滞
-
-        return 4
 
     def get_frequency(
         self, score: int, use_count: int, last_score_change: float = 0

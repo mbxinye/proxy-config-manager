@@ -40,6 +40,14 @@ class Config:
     SPEED_TEST_LIMIT = int(os.getenv("PROXY_SPEED_TEST_LIMIT", "0"))
     SPEED_TEST_WORKERS = int(os.getenv("PROXY_SPEED_WORKERS", "3"))
 
+    DELAY_TEST_URL = os.getenv("PROXY_DELAY_TEST_URL", "https://www.google.com/generate_204")
+    DELAY_TEST_TIMEOUT = int(os.getenv("PROXY_DELAY_TEST_TIMEOUT", "8000"))
+
+    UNLOCK_TEST_ENABLED = os.getenv("PROXY_UNLOCK_TEST_ENABLED", "true").lower() == "true"
+    UNLOCK_TEST_TIMEOUT = int(os.getenv("PROXY_UNLOCK_TEST_TIMEOUT", "10"))
+
+    NODE_NAME_MAX_LENGTH = int(os.getenv("PROXY_NODE_NAME_MAX_LENGTH", "20"))
+
     @classmethod
     def to_dict(cls) -> Dict[str, Any]:
         return {
@@ -62,6 +70,11 @@ class Config:
             "clash_rename_nodes_enabled": cls.CLASH_RENAME_NODES_ENABLED,
             "speed_test_limit": cls.SPEED_TEST_LIMIT,
             "speed_test_workers": cls.SPEED_TEST_WORKERS,
+            "delay_test_url": cls.DELAY_TEST_URL,
+            "delay_test_timeout": cls.DELAY_TEST_TIMEOUT,
+            "unlock_test_enabled": cls.UNLOCK_TEST_ENABLED,
+            "unlock_test_timeout": cls.UNLOCK_TEST_TIMEOUT,
+            "node_name_max_length": cls.NODE_NAME_MAX_LENGTH,
         }
 
     @classmethod

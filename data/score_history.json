@@ -164,5 +164,2163 @@
         "avg_latency": 1968.0
       }
     ]
+  },
+  {
+    "timestamp": "2026-02-04T22:25:22.945440",
+    "subscriptions": [
+      {
+        "name": "sub_001",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_002",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_003",
+        "score": 50,
+        "frequency": "sometimes",
+        "success_rate": 0.015384615384615385,
+        "avg_latency": 1252.0
+      },
+      {
+        "name": "sub_004",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_005",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_006",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_007",
+        "score": 50,
+        "frequency": "sometimes",
+        "success_rate": 0.015384615384615385,
+        "avg_latency": 1252.0
+      },
+      {
+        "name": "sub_008",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_009",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_010",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_011",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_012",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.047619047619047616,
+        "avg_latency": 1289.0
+      },
+      {
+        "name": "sub_013",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_014",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.07692307692307693,
+        "avg_latency": 2019.0
+      },
+      {
+        "name": "sub_015",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_016",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_017",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_018",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_019",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_020",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_021",
+        "score": 50,
+        "frequency": "sometimes",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_022",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_023",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.02702702702702703,
+        "avg_latency": 1968.0
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-04T22:26:43.466905",
+    "subscriptions": [
+      {
+        "name": "sub_001",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_002",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_003",
+        "score": 34,
+        "frequency": "rarely",
+        "success_rate": 0.015384615384615385,
+        "avg_latency": 1252.0
+      },
+      {
+        "name": "sub_004",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_005",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_006",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_007",
+        "score": 34,
+        "frequency": "rarely",
+        "success_rate": 0.015384615384615385,
+        "avg_latency": 1252.0
+      },
+      {
+        "name": "sub_008",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_009",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_010",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_011",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_012",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.047619047619047616,
+        "avg_latency": 1289.0
+      },
+      {
+        "name": "sub_013",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_014",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.07692307692307693,
+        "avg_latency": 2019.0
+      },
+      {
+        "name": "sub_015",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_016",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_017",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_018",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_019",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_020",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_021",
+        "score": 34,
+        "frequency": "rarely",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_022",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_023",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.02702702702702703,
+        "avg_latency": 1968.0
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-04T22:29:28.578859",
+    "subscriptions": [
+      {
+        "name": "sub_001",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_002",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_003",
+        "score": 31,
+        "frequency": "rarely",
+        "success_rate": 0.015384615384615385,
+        "avg_latency": 1252.0
+      },
+      {
+        "name": "sub_004",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_005",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_006",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_007",
+        "score": 31,
+        "frequency": "rarely",
+        "success_rate": 0.015384615384615385,
+        "avg_latency": 1252.0
+      },
+      {
+        "name": "sub_008",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_009",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_010",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_011",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_012",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.047619047619047616,
+        "avg_latency": 1289.0
+      },
+      {
+        "name": "sub_013",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_014",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.07692307692307693,
+        "avg_latency": 2019.0
+      },
+      {
+        "name": "sub_015",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_016",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_017",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_018",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_019",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_020",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_021",
+        "score": 33,
+        "frequency": "rarely",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_022",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_023",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.02702702702702703,
+        "avg_latency": 1968.0
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-04T22:30:12.312589",
+    "subscriptions": [
+      {
+        "name": "sub_001",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_002",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_003",
+        "score": 31,
+        "frequency": "rarely",
+        "success_rate": 0.015384615384615385,
+        "avg_latency": 1252.0
+      },
+      {
+        "name": "sub_004",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_005",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_006",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_007",
+        "score": 31,
+        "frequency": "rarely",
+        "success_rate": 0.015384615384615385,
+        "avg_latency": 1252.0
+      },
+      {
+        "name": "sub_008",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_009",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_010",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_011",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_012",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.047619047619047616,
+        "avg_latency": 1289.0
+      },
+      {
+        "name": "sub_013",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_014",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.07692307692307693,
+        "avg_latency": 2019.0
+      },
+      {
+        "name": "sub_015",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_016",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_017",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_018",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_019",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_020",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_021",
+        "score": 33,
+        "frequency": "rarely",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_022",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_023",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.02702702702702703,
+        "avg_latency": 1968.0
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-04T22:34:53.256790",
+    "subscriptions": [
+      {
+        "name": "sub_001",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_002",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_003",
+        "score": 31,
+        "frequency": "rarely",
+        "success_rate": 0.015384615384615385,
+        "avg_latency": 1252.0
+      },
+      {
+        "name": "sub_004",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_005",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_006",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_007",
+        "score": 31,
+        "frequency": "rarely",
+        "success_rate": 0.015384615384615385,
+        "avg_latency": 1252.0
+      },
+      {
+        "name": "sub_008",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_009",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_010",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_011",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_012",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.047619047619047616,
+        "avg_latency": 1289.0
+      },
+      {
+        "name": "sub_013",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_014",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.07692307692307693,
+        "avg_latency": 2019.0
+      },
+      {
+        "name": "sub_015",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_016",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_017",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_018",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_019",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_020",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_021",
+        "score": 33,
+        "frequency": "rarely",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_022",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_023",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.02702702702702703,
+        "avg_latency": 1968.0
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-04T22:36:27.451547",
+    "subscriptions": [
+      {
+        "name": "sub_001",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_002",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_003",
+        "score": 31,
+        "frequency": "rarely",
+        "success_rate": 0.015384615384615385,
+        "avg_latency": 1252.0
+      },
+      {
+        "name": "sub_004",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_005",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_006",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_007",
+        "score": 31,
+        "frequency": "rarely",
+        "success_rate": 0.015384615384615385,
+        "avg_latency": 1252.0
+      },
+      {
+        "name": "sub_008",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_009",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_010",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_011",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_012",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.047619047619047616,
+        "avg_latency": 1289.0
+      },
+      {
+        "name": "sub_013",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_014",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.07692307692307693,
+        "avg_latency": 2019.0
+      },
+      {
+        "name": "sub_015",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_016",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_017",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_018",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_019",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_020",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_021",
+        "score": 33,
+        "frequency": "rarely",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_022",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_023",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.02702702702702703,
+        "avg_latency": 1968.0
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-04T22:39:39.472898",
+    "subscriptions": [
+      {
+        "name": "sub_001",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_002",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_003",
+        "score": 31,
+        "frequency": "rarely",
+        "success_rate": 0.015384615384615385,
+        "avg_latency": 1252.0
+      },
+      {
+        "name": "sub_004",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_005",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_006",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_007",
+        "score": 31,
+        "frequency": "rarely",
+        "success_rate": 0.015384615384615385,
+        "avg_latency": 1252.0
+      },
+      {
+        "name": "sub_008",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_009",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_010",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_011",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_012",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.047619047619047616,
+        "avg_latency": 1289.0
+      },
+      {
+        "name": "sub_013",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_014",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.07692307692307693,
+        "avg_latency": 2019.0
+      },
+      {
+        "name": "sub_015",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_016",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_017",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_018",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_019",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_020",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_021",
+        "score": 33,
+        "frequency": "rarely",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_022",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_023",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.02702702702702703,
+        "avg_latency": 1968.0
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-04T22:44:56.619396",
+    "subscriptions": [
+      {
+        "name": "sub_001",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_002",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_003",
+        "score": 31,
+        "frequency": "rarely",
+        "success_rate": 0.015384615384615385,
+        "avg_latency": 1252.0
+      },
+      {
+        "name": "sub_004",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_005",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_006",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_007",
+        "score": 31,
+        "frequency": "rarely",
+        "success_rate": 0.015384615384615385,
+        "avg_latency": 1252.0
+      },
+      {
+        "name": "sub_008",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_009",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_010",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_011",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_012",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.047619047619047616,
+        "avg_latency": 1289.0
+      },
+      {
+        "name": "sub_013",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_014",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.07692307692307693,
+        "avg_latency": 2019.0
+      },
+      {
+        "name": "sub_015",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_016",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_017",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_018",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_019",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_020",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_021",
+        "score": 33,
+        "frequency": "rarely",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_022",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_023",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.02702702702702703,
+        "avg_latency": 1968.0
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-04T22:51:36.767885",
+    "subscriptions": [
+      {
+        "name": "sub_001",
+        "score": 50,
+        "frequency": "sometimes",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_002",
+        "score": 53,
+        "frequency": "sometimes",
+        "success_rate": 0.125,
+        "avg_latency": 2063.0
+      },
+      {
+        "name": "sub_003",
+        "score": 31,
+        "frequency": "rarely",
+        "success_rate": 0.015384615384615385,
+        "avg_latency": 1252.0
+      },
+      {
+        "name": "sub_004",
+        "score": 51,
+        "frequency": "sometimes",
+        "success_rate": 0.057692307692307696,
+        "avg_latency": 2536.6666666666665
+      },
+      {
+        "name": "sub_005",
+        "score": 50,
+        "frequency": "sometimes",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_006",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_007",
+        "score": 31,
+        "frequency": "rarely",
+        "success_rate": 0.015384615384615385,
+        "avg_latency": 1252.0
+      },
+      {
+        "name": "sub_008",
+        "score": 50,
+        "frequency": "sometimes",
+        "success_rate": 0.020833333333333332,
+        "avg_latency": 977.6666666666666
+      },
+      {
+        "name": "sub_009",
+        "score": 70,
+        "frequency": "normal",
+        "success_rate": 0.018867924528301886,
+        "avg_latency": 202.0
+      },
+      {
+        "name": "sub_010",
+        "score": 50,
+        "frequency": "sometimes",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_011",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_012",
+        "score": 31,
+        "frequency": "rarely",
+        "success_rate": 0.02702702702702703,
+        "avg_latency": 1289.0
+      },
+      {
+        "name": "sub_013",
+        "score": 35,
+        "frequency": "rarely",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_014",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.07692307692307693,
+        "avg_latency": 2019.0
+      },
+      {
+        "name": "sub_015",
+        "score": 35,
+        "frequency": "rarely",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_016",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_017",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_018",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_019",
+        "score": 50,
+        "frequency": "sometimes",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_020",
+        "score": 50,
+        "frequency": "sometimes",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_021",
+        "score": 33,
+        "frequency": "rarely",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_022",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_023",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.02702702702702703,
+        "avg_latency": 1968.0
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-04T22:59:08.537218",
+    "subscriptions": [
+      {
+        "name": "sub_001",
+        "score": 50,
+        "frequency": "sometimes",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_002",
+        "score": 36,
+        "frequency": "rarely",
+        "success_rate": 0.125,
+        "avg_latency": 1316.0
+      },
+      {
+        "name": "sub_003",
+        "score": 31,
+        "frequency": "rarely",
+        "success_rate": 0.015384615384615385,
+        "avg_latency": 1252.0
+      },
+      {
+        "name": "sub_004",
+        "score": 33,
+        "frequency": "rarely",
+        "success_rate": 0.038461538461538464,
+        "avg_latency": 2364.333333333333
+      },
+      {
+        "name": "sub_005",
+        "score": 50,
+        "frequency": "sometimes",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_006",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_007",
+        "score": 31,
+        "frequency": "rarely",
+        "success_rate": 0.015384615384615385,
+        "avg_latency": 1252.0
+      },
+      {
+        "name": "sub_008",
+        "score": 50,
+        "frequency": "sometimes",
+        "success_rate": 0.020833333333333332,
+        "avg_latency": 977.6666666666666
+      },
+      {
+        "name": "sub_009",
+        "score": 70,
+        "frequency": "normal",
+        "success_rate": 0.018867924528301886,
+        "avg_latency": 202.0
+      },
+      {
+        "name": "sub_010",
+        "score": 35,
+        "frequency": "rarely",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_011",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_012",
+        "score": 31,
+        "frequency": "rarely",
+        "success_rate": 0.02702702702702703,
+        "avg_latency": 1289.0
+      },
+      {
+        "name": "sub_013",
+        "score": 34,
+        "frequency": "rarely",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_014",
+        "score": 33,
+        "frequency": "rarely",
+        "success_rate": 0.0625,
+        "avg_latency": 2019.0
+      },
+      {
+        "name": "sub_015",
+        "score": 35,
+        "frequency": "rarely",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_016",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_017",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_018",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_019",
+        "score": 33,
+        "frequency": "rarely",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_020",
+        "score": 50,
+        "frequency": "sometimes",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_021",
+        "score": 33,
+        "frequency": "rarely",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_022",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_023",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0.02702702702702703,
+        "avg_latency": 1968.0
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-12T20:59:33.659418",
+    "subscriptions": [
+      {
+        "name": "sub_001",
+        "score": 50,
+        "frequency": "sometimes",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_002",
+        "score": 36,
+        "frequency": "rarely",
+        "success_rate": 0.125,
+        "avg_latency": 1316.0
+      },
+      {
+        "name": "sub_003",
+        "score": 31,
+        "frequency": "rarely",
+        "success_rate": 0.015384615384615385,
+        "avg_latency": 1252.0
+      },
+      {
+        "name": "sub_004",
+        "score": 33,
+        "frequency": "rarely",
+        "success_rate": 0.038461538461538464,
+        "avg_latency": 2364.333333333333
+      },
+      {
+        "name": "sub_005",
+        "score": 50,
+        "frequency": "sometimes",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_006",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_007",
+        "score": 31,
+        "frequency": "rarely",
+        "success_rate": 0.015384615384615385,
+        "avg_latency": 1252.0
+      },
+      {
+        "name": "sub_008",
+        "score": 50,
+        "frequency": "sometimes",
+        "success_rate": 0.020833333333333332,
+        "avg_latency": 977.6666666666666
+      },
+      {
+        "name": "sub_009",
+        "score": 70,
+        "frequency": "normal",
+        "success_rate": 0.018867924528301886,
+        "avg_latency": 202.0
+      },
+      {
+        "name": "sub_010",
+        "score": 35,
+        "frequency": "rarely",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_011",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_012",
+        "score": 31,
+        "frequency": "rarely",
+        "success_rate": 0.02702702702702703,
+        "avg_latency": 1289.0
+      },
+      {
+        "name": "sub_013",
+        "score": 34,
+        "frequency": "rarely",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_014",
+        "score": 33,
+        "frequency": "rarely",
+        "success_rate": 0.0625,
+        "avg_latency": 2019.0
+      },
+      {
+        "name": "sub_015",
+        "score": 4,
+        "frequency": "recovery",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_016",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_017",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_018",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_019",
+        "score": 33,
+        "frequency": "rarely",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_020",
+        "score": 50,
+        "frequency": "sometimes",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_021",
+        "score": 33,
+        "frequency": "rarely",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_022",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_023",
+        "score": 24,
+        "frequency": "recovery",
+        "success_rate": 0.023255813953488372,
+        "avg_latency": 2552.0
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-12T21:14:50.136176",
+    "subscriptions": [
+      {
+        "name": "sub_001",
+        "score": 50,
+        "frequency": "sometimes",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_002",
+        "score": 40,
+        "frequency": "sometimes",
+        "success_rate": 0.17777777777777776,
+        "avg_latency": 1453.1666666666667
+      },
+      {
+        "name": "sub_003",
+        "score": 31,
+        "frequency": "rarely",
+        "success_rate": 0.015384615384615385,
+        "avg_latency": 1252.0
+      },
+      {
+        "name": "sub_004",
+        "score": 34,
+        "frequency": "rarely",
+        "success_rate": 0.032467532467532464,
+        "avg_latency": 3208.222222222222
+      },
+      {
+        "name": "sub_005",
+        "score": 50,
+        "frequency": "sometimes",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_006",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_007",
+        "score": 31,
+        "frequency": "rarely",
+        "success_rate": 0.015384615384615385,
+        "avg_latency": 1252.0
+      },
+      {
+        "name": "sub_008",
+        "score": 50,
+        "frequency": "sometimes",
+        "success_rate": 0.020833333333333332,
+        "avg_latency": 977.6666666666666
+      },
+      {
+        "name": "sub_009",
+        "score": 70,
+        "frequency": "normal",
+        "success_rate": 0.018867924528301886,
+        "avg_latency": 202.0
+      },
+      {
+        "name": "sub_010",
+        "score": 35,
+        "frequency": "rarely",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_011",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_012",
+        "score": 14,
+        "frequency": "recovery",
+        "success_rate": 0.016666666666666666,
+        "avg_latency": 1289.0
+      },
+      {
+        "name": "sub_013",
+        "score": 4,
+        "frequency": "recovery",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_014",
+        "score": 33,
+        "frequency": "rarely",
+        "success_rate": 0.0625,
+        "avg_latency": 2019.0
+      },
+      {
+        "name": "sub_015",
+        "score": 4,
+        "frequency": "recovery",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_016",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_017",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_018",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_019",
+        "score": 33,
+        "frequency": "rarely",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_020",
+        "score": 50,
+        "frequency": "sometimes",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_021",
+        "score": 33,
+        "frequency": "rarely",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_022",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_023",
+        "score": 24,
+        "frequency": "recovery",
+        "success_rate": 0.023255813953488372,
+        "avg_latency": 2552.0
+      }
+    ]
+  },
+  {
+    "timestamp": "2026-02-12T21:20:15.523039",
+    "subscriptions": [
+      {
+        "name": "sub_001",
+        "score": 50,
+        "frequency": "sometimes",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_002",
+        "score": 40,
+        "frequency": "sometimes",
+        "success_rate": 0.17777777777777776,
+        "avg_latency": 1453.1666666666667
+      },
+      {
+        "name": "sub_003",
+        "score": 31,
+        "frequency": "rarely",
+        "success_rate": 0.015384615384615385,
+        "avg_latency": 1252.0
+      },
+      {
+        "name": "sub_004",
+        "score": 34,
+        "frequency": "rarely",
+        "success_rate": 0.032467532467532464,
+        "avg_latency": 3208.222222222222
+      },
+      {
+        "name": "sub_005",
+        "score": 4,
+        "frequency": "recovery",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_006",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_007",
+        "score": 31,
+        "frequency": "rarely",
+        "success_rate": 0.015384615384615385,
+        "avg_latency": 1252.0
+      },
+      {
+        "name": "sub_008",
+        "score": 25,
+        "frequency": "rarely",
+        "success_rate": 0.03773584905660377,
+        "avg_latency": 1361.547619047619
+      },
+      {
+        "name": "sub_009",
+        "score": 70,
+        "frequency": "normal",
+        "success_rate": 0.018867924528301886,
+        "avg_latency": 202.0
+      },
+      {
+        "name": "sub_010",
+        "score": 35,
+        "frequency": "rarely",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_011",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_012",
+        "score": 14,
+        "frequency": "recovery",
+        "success_rate": 0.011976047904191617,
+        "avg_latency": 1289.0
+      },
+      {
+        "name": "sub_013",
+        "score": 4,
+        "frequency": "recovery",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_014",
+        "score": 33,
+        "frequency": "rarely",
+        "success_rate": 0.0625,
+        "avg_latency": 2019.0
+      },
+      {
+        "name": "sub_015",
+        "score": 4,
+        "frequency": "recovery",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_016",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_017",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_018",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_019",
+        "score": 33,
+        "frequency": "rarely",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_020",
+        "score": 50,
+        "frequency": "sometimes",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_021",
+        "score": 33,
+        "frequency": "rarely",
+        "success_rate": 0.0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_022",
+        "score": 75,
+        "frequency": "new",
+        "success_rate": 0,
+        "avg_latency": 999
+      },
+      {
+        "name": "sub_023",
+        "score": 24,
+        "frequency": "recovery",
+        "success_rate": 0.023255813953488372,
+        "avg_latency": 2552.0
+      }
+    ]
   }
 ]

@@ -19,6 +19,7 @@ env:
   # 高性能模式配置
   PROXY_BATCH_SIZE: '100'
   PROXY_BATCH_DELAY: '0.1'
+  CLASH_CORE: 'meta'
 
 jobs:
   update-proxy-config:
@@ -98,6 +99,7 @@ jobs:
       env:
         PROXY_BATCH_SIZE: 100
         PROXY_BATCH_DELAY: 0.1
+        CLASH_CORE: meta
     
     - name: Prepare GitHub Pages
       run: |

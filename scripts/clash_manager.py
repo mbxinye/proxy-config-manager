@@ -180,9 +180,14 @@ class ClashManager:
         return []
 
     async def test_proxy_delay(
-        self, proxy_name: str, test_url: str, timeout: int = 5000
+        self, proxy_name: str, test_url: str = None, timeout: int = None
     ) -> Tuple[Optional[int], str]:
         """测试单个代理延迟"""
+        if test_url is None:
+            test_url = Config.DELAY_TEST_URL
+        if timeout is None:
+            timeout = Config.DELAY_TEST_TIMEOUT
+            
         try:
             encoded_name = urllib.parse.quote(proxy_name)
             url = f"{self.api_url}/proxies/{encoded_name}/delay"

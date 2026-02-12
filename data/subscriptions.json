@@ -3,52 +3,127 @@
     {
       "url": "https://raw.githubusercontent.com/zhangkaiitugithub/passcro/main/speednodes.yaml",
       "name": "sub_001",
-      "score": 75,
-      "success_rate": 0,
+      "score": 50,
+      "success_rate": 0.0,
       "avg_latency": 999,
-      "avg_nodes": 0,
-      "valid_nodes": 0,
-      "last_used": "2026-02-04T20:48:48.693460",
-      "use_count": 2,
-      "frequency": "new",
+      "avg_nodes": 65.0,
+      "valid_nodes": 0.0,
+      "last_used": "2026-02-04T22:50:16.082276",
+      "use_count": 11,
+      "frequency": "sometimes",
       "created_at": "2026-02-04T20:47:54.688659",
-      "history": [],
-      "consecutive_failures": 0,
+      "history": [
+        {
+          "date": "2026-02-04T22:51:36.764438",
+          "total_nodes": 65,
+          "valid_nodes": 0,
+          "avg_latency": 9999
+        }
+      ],
+      "consecutive_failures": 1,
       "best_score": 75,
-      "last_score_change": 0,
+      "last_score_change": -25,
       "recovery_count": 0
     },
     {
       "url": "https://gist.githubusercontent.com/shuaidaoya/9e5cf2749c0ce79932dd9229d9b4162b/raw/all.yaml",
       "name": "sub_002",
-      "score": 75,
-      "success_rate": 0,
-      "avg_latency": 999,
-      "avg_nodes": 0,
-      "valid_nodes": 0,
-      "last_used": "2026-02-04T20:48:48.693481",
-      "use_count": 2,
-      "frequency": "new",
+      "score": 40,
+      "success_rate": 0.17777777777777776,
+      "avg_latency": 1453.1666666666667,
+      "avg_nodes": 15.0,
+      "valid_nodes": 2.6666666666666665,
+      "last_used": "2026-02-12T21:12:54.660260",
+      "use_count": 13,
+      "frequency": "sometimes",
       "created_at": "2026-02-04T20:47:54.688677",
-      "history": [],
+      "history": [
+        {
+          "date": "2026-02-04T22:51:36.764534",
+          "total_nodes": 8,
+          "valid_nodes": 1,
+          "avg_latency": 2063.0
+        },
+        {
+          "date": "2026-02-04T22:59:08.534658",
+          "total_nodes": 8,
+          "valid_nodes": 1,
+          "avg_latency": 569.0
+        },
+        {
+          "date": "2026-02-12T21:14:50.134479",
+          "total_nodes": 29,
+          "valid_nodes": 6,
+          "avg_latency": 1727.5
+        }
+      ],
       "consecutive_failures": 0,
       "best_score": 75,
-      "last_score_change": 0,
+      "last_score_change": 4,
       "recovery_count": 0
     },
     {
       "url": "https://raw.githubusercontent.com/snakem982/proxypool/main/source/clash-meta.yaml",
       "name": "sub_003",
-      "score": 75,
-      "success_rate": 0,
-      "avg_latency": 999,
-      "avg_nodes": 0,
-      "valid_nodes": 0,
-      "last_used": "2026-02-04T20:48:48.693485",
-      "use_count": 2,
-      "frequency": "new",
+      "score": 31,
+      "success_rate": 0.015384615384615385,
+      "avg_latency": 1252.0,
+      "avg_nodes": 65.0,
+      "valid_nodes": 1.0,
+      "last_used": "2026-02-12T21:12:54.660282",
+      "use_count": 5,
+      "frequency": "rarely",
       "created_at": "2026-02-04T20:47:54.688684",
-      "history": [],
+      "history": [
+        {
+          "date": "2026-02-04T22:25:22.943023",
+          "total_nodes": 65,
+          "valid_nodes": 1,
+          "avg_latency": 1252.0
+        },
+        {
+          "date": "2026-02-04T22:26:43.463042",
+          "total_nodes": 65,
+          "valid_nodes": 1,
+          "avg_latency": 1252.0
+        },
+        {
+          "date": "2026-02-04T22:29:28.576325",
+          "total_nodes": 65,
+          "valid_nodes": 1,
+          "avg_latency": 1252.0
+        },
+        {
+          "date": "2026-02-04T22:30:12.310314",
+          "total_nodes": 65,
+          "valid_nodes": 1,
+          "avg_latency": 1252.0
+        },
+        {
+          "date": "2026-02-04T22:34:53.254152",
+          "total_nodes": 65,
+          "valid_nodes": 1,
+          "avg_latency": 1252.0
+        },
+        {
+          "date": "2026-02-04T22:36:27.448959",
+          "total_nodes": 65,
+          "valid_nodes": 1,
+          "avg_latency": 1252.0
+        },
+        {
+          "date": "2026-02-04T22:39:39.470164",
+          "total_nodes": 65,
+          "valid_nodes": 1,
+          "avg_latency": 1252.0
+        },
+        {
+          "date": "2026-02-04T22:44:56.616968",
+          "total_nodes": 65,
+          "valid_nodes": 1,
+          "avg_latency": 1252.0
+        }
+      ],
       "consecutive_failures": 0,
       "best_score": 75,
       "last_score_change": 0,
@@ -57,37 +132,69 @@
     {
       "url": "https://raw.githubusercontent.com/ts-sf/fly/main/clash",
       "name": "sub_004",
-      "score": 75,
-      "success_rate": 0,
-      "avg_latency": 999,
-      "avg_nodes": 0,
-      "valid_nodes": 0,
-      "last_used": "2026-02-04T20:48:48.693488",
-      "use_count": 2,
-      "frequency": "new",
+      "score": 34,
+      "success_rate": 0.032467532467532464,
+      "avg_latency": 3208.222222222222,
+      "avg_nodes": 51.333333333333336,
+      "valid_nodes": 1.6666666666666667,
+      "last_used": "2026-02-12T21:12:54.660287",
+      "use_count": 13,
+      "frequency": "rarely",
       "created_at": "2026-02-04T20:47:54.688690",
-      "history": [],
+      "history": [
+        {
+          "date": "2026-02-04T22:51:36.764595",
+          "total_nodes": 52,
+          "valid_nodes": 3,
+          "avg_latency": 2536.6666666666665
+        },
+        {
+          "date": "2026-02-04T22:59:08.534746",
+          "total_nodes": 52,
+          "valid_nodes": 1,
+          "avg_latency": 2192.0
+        },
+        {
+          "date": "2026-02-12T21:14:50.134527",
+          "total_nodes": 50,
+          "valid_nodes": 1,
+          "avg_latency": 4896.0
+        }
+      ],
       "consecutive_failures": 0,
       "best_score": 75,
-      "last_score_change": 0,
+      "last_score_change": 1,
       "recovery_count": 0
     },
     {
       "url": "https://raw.githubusercontent.com/chengaopan/AutoMergePublicNodes/master/list.meta.yml",
       "name": "sub_005",
-      "score": 75,
-      "success_rate": 0,
+      "score": 4,
+      "success_rate": 0.0,
       "avg_latency": 999,
-      "avg_nodes": 0,
-      "valid_nodes": 0,
-      "last_used": "2026-02-04T20:48:48.693491",
-      "use_count": 2,
-      "frequency": "new",
+      "avg_nodes": 48.0,
+      "valid_nodes": 0.0,
+      "last_used": "2026-02-12T21:19:39.063660",
+      "use_count": 13,
+      "frequency": "recovery",
       "created_at": "2026-02-04T20:47:54.688695",
-      "history": [],
-      "consecutive_failures": 0,
+      "history": [
+        {
+          "date": "2026-02-04T22:51:36.764618",
+          "total_nodes": 23,
+          "valid_nodes": 0,
+          "avg_latency": 9999
+        },
+        {
+          "date": "2026-02-12T21:20:15.520315",
+          "total_nodes": 73,
+          "valid_nodes": 0,
+          "avg_latency": 9999
+        }
+      ],
+      "consecutive_failures": 2,
       "best_score": 75,
-      "last_score_change": 0,
+      "last_score_change": -46,
       "recovery_count": 0
     },
     {
@@ -98,8 +205,8 @@
       "avg_latency": 999,
       "avg_nodes": 0,
       "valid_nodes": 0,
-      "last_used": "2026-02-04T20:48:48.693493",
-      "use_count": 2,
+      "last_used": "2026-02-12T21:19:39.063737",
+      "use_count": 15,
       "frequency": "new",
       "created_at": "2026-02-04T20:47:54.688700",
       "history": [],
@@ -111,16 +218,65 @@
     {
       "url": "https://raw.githubusercontent.com/snakem982/proxypool/main/source/clash-meta.yaml",
       "name": "sub_007",
-      "score": 75,
-      "success_rate": 0,
-      "avg_latency": 999,
-      "avg_nodes": 0,
-      "valid_nodes": 0,
-      "last_used": "2026-02-04T20:48:48.693495",
-      "use_count": 2,
-      "frequency": "new",
+      "score": 31,
+      "success_rate": 0.015384615384615385,
+      "avg_latency": 1252.0,
+      "avg_nodes": 65.0,
+      "valid_nodes": 1.0,
+      "last_used": "2026-02-04T22:24:34.893743",
+      "use_count": 3,
+      "frequency": "rarely",
       "created_at": "2026-02-04T20:47:54.688709",
-      "history": [],
+      "history": [
+        {
+          "date": "2026-02-04T22:25:22.943087",
+          "total_nodes": 65,
+          "valid_nodes": 1,
+          "avg_latency": 1252.0
+        },
+        {
+          "date": "2026-02-04T22:26:43.463222",
+          "total_nodes": 65,
+          "valid_nodes": 1,
+          "avg_latency": 1252.0
+        },
+        {
+          "date": "2026-02-04T22:29:28.576447",
+          "total_nodes": 65,
+          "valid_nodes": 1,
+          "avg_latency": 1252.0
+        },
+        {
+          "date": "2026-02-04T22:30:12.310419",
+          "total_nodes": 65,
+          "valid_nodes": 1,
+          "avg_latency": 1252.0
+        },
+        {
+          "date": "2026-02-04T22:34:53.254287",
+          "total_nodes": 65,
+          "valid_nodes": 1,
+          "avg_latency": 1252.0
+        },
+        {
+          "date": "2026-02-04T22:36:27.449070",
+          "total_nodes": 65,
+          "valid_nodes": 1,
+          "avg_latency": 1252.0
+        },
+        {
+          "date": "2026-02-04T22:39:39.470352",
+          "total_nodes": 65,
+          "valid_nodes": 1,
+          "avg_latency": 1252.0
+        },
+        {
+          "date": "2026-02-04T22:44:56.617081",
+          "total_nodes": 65,
+          "valid_nodes": 1,
+          "avg_latency": 1252.0
+        }
+      ],
       "consecutive_failures": 0,
       "best_score": 75,
       "last_score_change": 0,
@@ -129,55 +285,88 @@
     {
       "url": "https://raw.githubusercontent.com/snakem982/proxypool/main/source/clash-meta-2.yaml",
       "name": "sub_008",
-      "score": 75,
-      "success_rate": 0,
-      "avg_latency": 999,
-      "avg_nodes": 0,
-      "valid_nodes": 0,
-      "last_used": "2026-02-04T20:48:48.693498",
-      "use_count": 2,
-      "frequency": "new",
+      "score": 25,
+      "success_rate": 0.03773584905660377,
+      "avg_latency": 1361.547619047619,
+      "avg_nodes": 132.5,
+      "valid_nodes": 5.0,
+      "last_used": "2026-02-12T21:19:39.063744",
+      "use_count": 13,
+      "frequency": "rarely",
       "created_at": "2026-02-04T20:47:54.688719",
-      "history": [],
+      "history": [
+        {
+          "date": "2026-02-04T22:51:36.764634",
+          "total_nodes": 144,
+          "valid_nodes": 3,
+          "avg_latency": 977.6666666666666
+        },
+        {
+          "date": "2026-02-12T21:20:15.520356",
+          "total_nodes": 121,
+          "valid_nodes": 7,
+          "avg_latency": 1745.4285714285713
+        }
+      ],
       "consecutive_failures": 0,
       "best_score": 75,
-      "last_score_change": 0,
+      "last_score_change": -25,
       "recovery_count": 0
     },
     {
       "url": "https://raw.githubusercontent.com/peasoft/NoMoreWalls/master/list.meta.yml",
       "name": "sub_009",
-      "score": 75,
-      "success_rate": 0,
-      "avg_latency": 999,
-      "avg_nodes": 0,
-      "valid_nodes": 0,
-      "last_used": "2026-02-04T20:48:48.693500",
-      "use_count": 2,
-      "frequency": "new",
+      "score": 70,
+      "success_rate": 0.018867924528301886,
+      "avg_latency": 202.0,
+      "avg_nodes": 53.0,
+      "valid_nodes": 1.0,
+      "last_used": "2026-02-04T22:50:16.082330",
+      "use_count": 11,
+      "frequency": "normal",
       "created_at": "2026-02-04T20:47:54.688723",
-      "history": [],
+      "history": [
+        {
+          "date": "2026-02-04T22:51:36.764649",
+          "total_nodes": 53,
+          "valid_nodes": 1,
+          "avg_latency": 202.0
+        }
+      ],
       "consecutive_failures": 0,
       "best_score": 75,
-      "last_score_change": 0,
+      "last_score_change": -5,
       "recovery_count": 0
     },
     {
       "url": "https://raw.githubusercontent.com/shaoyouvip/free/refs/heads/main/all.yaml",
       "name": "sub_010",
-      "score": 75,
-      "success_rate": 0,
+      "score": 35,
+      "success_rate": 0.0,
       "avg_latency": 999,
-      "avg_nodes": 0,
-      "valid_nodes": 0,
-      "last_used": "2026-02-04T20:48:48.693502",
-      "use_count": 2,
-      "frequency": "new",
+      "avg_nodes": 25.0,
+      "valid_nodes": 0.0,
+      "last_used": "2026-02-04T22:58:15.584386",
+      "use_count": 12,
+      "frequency": "rarely",
       "created_at": "2026-02-04T20:47:54.688728",
-      "history": [],
-      "consecutive_failures": 0,
+      "history": [
+        {
+          "date": "2026-02-04T22:51:36.764661",
+          "total_nodes": 24,
+          "valid_nodes": 0,
+          "avg_latency": 9999
+        },
+        {
+          "date": "2026-02-04T22:59:08.534776",
+          "total_nodes": 26,
+          "valid_nodes": 0,
+          "avg_latency": 9999
+        }
+      ],
+      "consecutive_failures": 2,
       "best_score": 75,
-      "last_score_change": 0,
+      "last_score_change": -15,
       "recovery_count": 0
     },
     {
@@ -188,8 +377,8 @@
       "avg_latency": 999,
       "avg_nodes": 0,
       "valid_nodes": 0,
-      "last_used": "2026-02-04T20:48:48.693505",
-      "use_count": 2,
+      "last_used": "2026-02-12T21:19:39.063749",
+      "use_count": 15,
       "frequency": "new",
       "created_at": "2026-02-04T20:47:54.688732",
       "history": [],
@@ -201,14 +390,14 @@
     {
       "url": "https://gh-proxy.com/raw.githubusercontent.com/Barabama/FreeNodes/main/nodes/blues.yaml",
       "name": "sub_012",
-      "score": 75,
-      "success_rate": 0.047619047619047616,
+      "score": 14,
+      "success_rate": 0.011976047904191617,
       "avg_latency": 1289.0,
-      "avg_nodes": 42.0,
-      "valid_nodes": 2.0,
-      "last_used": "2026-02-04T20:48:48.693507",
-      "use_count": 2,
-      "frequency": "new",
+      "avg_nodes": 41.75,
+      "valid_nodes": 0.5,
+      "last_used": "2026-02-12T21:19:39.063760",
+      "use_count": 13,
+      "frequency": "recovery",
       "created_at": "2026-02-04T20:47:54.688743",
       "history": [
         {
@@ -216,9 +405,27 @@
           "total_nodes": 42,
           "valid_nodes": 2,
           "avg_latency": 1289.0
+        },
+        {
+          "date": "2026-02-04T22:51:36.764810",
+          "total_nodes": 32,
+          "valid_nodes": 0,
+          "avg_latency": 9999
+        },
+        {
+          "date": "2026-02-12T21:14:50.134549",
+          "total_nodes": 46,
+          "valid_nodes": 0,
+          "avg_latency": 9999
+        },
+        {
+          "date": "2026-02-12T21:20:15.520377",
+          "total_nodes": 47,
+          "valid_nodes": 0,
+          "avg_latency": 9999
         }
       ],
-      "consecutive_failures": 0,
+      "consecutive_failures": 3,
       "best_score": 75,
       "last_score_change": 0,
       "recovery_count": 0
@@ -226,14 +433,14 @@
     {
       "url": "https://gh-proxy.com/raw.githubusercontent.com/Barabama/FreeNodes/main/nodes/clashmeta.yaml",
       "name": "sub_013",
-      "score": 75,
+      "score": 4,
       "success_rate": 0.0,
       "avg_latency": 999,
-      "avg_nodes": 62.0,
+      "avg_nodes": 61.5,
       "valid_nodes": 0.0,
-      "last_used": "2026-02-04T20:48:48.693509",
-      "use_count": 2,
-      "frequency": "new",
+      "last_used": "2026-02-12T21:12:54.660302",
+      "use_count": 13,
+      "frequency": "recovery",
       "created_at": "2026-02-04T20:47:54.688757",
       "history": [
         {
@@ -241,24 +448,42 @@
           "total_nodes": 62,
           "valid_nodes": 0,
           "avg_latency": 9999
+        },
+        {
+          "date": "2026-02-04T22:51:36.765048",
+          "total_nodes": 61,
+          "valid_nodes": 0,
+          "avg_latency": 9999
+        },
+        {
+          "date": "2026-02-04T22:59:08.534795",
+          "total_nodes": 61,
+          "valid_nodes": 0,
+          "avg_latency": 9999
+        },
+        {
+          "date": "2026-02-12T21:14:50.134565",
+          "total_nodes": 62,
+          "valid_nodes": 0,
+          "avg_latency": 9999
         }
       ],
-      "consecutive_failures": 1,
+      "consecutive_failures": 4,
       "best_score": 75,
-      "last_score_change": 0,
+      "last_score_change": -30,
       "recovery_count": 0
     },
     {
       "url": "https://gh-proxy.com/raw.githubusercontent.com/Barabama/FreeNodes/main/nodes/ndnode.yaml",
       "name": "sub_014",
-      "score": 75,
-      "success_rate": 0.07692307692307693,
+      "score": 33,
+      "success_rate": 0.0625,
       "avg_latency": 2019.0,
-      "avg_nodes": 13.0,
-      "valid_nodes": 1.0,
-      "last_used": "2026-02-04T20:48:48.693512",
-      "use_count": 2,
-      "frequency": "new",
+      "avg_nodes": 8.0,
+      "valid_nodes": 0.5,
+      "last_used": "2026-02-04T22:58:15.584406",
+      "use_count": 12,
+      "frequency": "rarely",
       "created_at": "2026-02-04T20:47:54.688762",
       "history": [
         {
@@ -266,24 +491,30 @@
           "total_nodes": 13,
           "valid_nodes": 1,
           "avg_latency": 2019.0
+        },
+        {
+          "date": "2026-02-04T22:59:08.534822",
+          "total_nodes": 3,
+          "valid_nodes": 0,
+          "avg_latency": 9999
         }
       ],
-      "consecutive_failures": 0,
+      "consecutive_failures": 1,
       "best_score": 75,
-      "last_score_change": 0,
+      "last_score_change": -42,
       "recovery_count": 0
     },
     {
       "url": "https://gh-proxy.com/raw.githubusercontent.com/Barabama/FreeNodes/main/nodes/nodev2ray.yaml",
       "name": "sub_015",
-      "score": 75,
+      "score": 4,
       "success_rate": 0.0,
       "avg_latency": 999,
-      "avg_nodes": 52.0,
+      "avg_nodes": 37.25,
       "valid_nodes": 0.0,
-      "last_used": "2026-02-04T20:48:48.693514",
-      "use_count": 2,
-      "frequency": "new",
+      "last_used": "2026-02-12T21:19:39.063769",
+      "use_count": 13,
+      "frequency": "recovery",
       "created_at": "2026-02-04T20:47:54.688765",
       "history": [
         {
@@ -291,9 +522,27 @@
           "total_nodes": 52,
           "valid_nodes": 0,
           "avg_latency": 9999
+        },
+        {
+          "date": "2026-02-04T22:51:36.765096",
+          "total_nodes": 50,
+          "valid_nodes": 0,
+          "avg_latency": 9999
+        },
+        {
+          "date": "2026-02-12T20:59:33.657848",
+          "total_nodes": 25,
+          "valid_nodes": 0,
+          "avg_latency": 9999
+        },
+        {
+          "date": "2026-02-12T21:20:15.520392",
+          "total_nodes": 22,
+          "valid_nodes": 0,
+          "avg_latency": 9999
         }
       ],
-      "consecutive_failures": 1,
+      "consecutive_failures": 4,
       "best_score": 75,
       "last_score_change": 0,
       "recovery_count": 0
@@ -306,8 +555,8 @@
       "avg_latency": 999,
       "avg_nodes": 0,
       "valid_nodes": 0,
-      "last_used": "2026-02-04T20:48:48.693516",
-      "use_count": 2,
+      "last_used": "2026-02-12T21:19:39.063771",
+      "use_count": 15,
       "frequency": "new",
       "created_at": "2026-02-04T20:47:54.688769",
       "history": [],
@@ -324,8 +573,8 @@
       "avg_latency": 999,
       "avg_nodes": 0,
       "valid_nodes": 0,
-      "last_used": "2026-02-04T20:48:48.693518",
-      "use_count": 2,
+      "last_used": "2026-02-12T21:19:39.063774",
+      "use_count": 15,
       "frequency": "new",
       "created_at": "2026-02-04T20:47:54.688782",
       "history": [],
@@ -342,8 +591,8 @@
       "avg_latency": 999,
       "avg_nodes": 0,
       "valid_nodes": 0,
-      "last_used": "2026-02-04T20:48:48.693521",
-      "use_count": 2,
+      "last_used": "2026-02-12T21:19:39.063777",
+      "use_count": 15,
       "frequency": "new",
       "created_at": "2026-02-04T20:47:54.688786",
       "history": [],
@@ -355,53 +604,122 @@
     {
       "url": "https://raw.githubusercontent.com/asgharkapk/Sub-Config-Extractor/refs/heads/main/output_configs/clash/10ium/HiN-VPN/subscription/hiddify/vless.yaml",
       "name": "sub_019",
-      "score": 75,
-      "success_rate": 0,
+      "score": 33,
+      "success_rate": 0.0,
       "avg_latency": 999,
-      "avg_nodes": 0,
-      "valid_nodes": 0,
-      "last_used": "2026-02-04T20:48:48.693523",
-      "use_count": 2,
-      "frequency": "new",
+      "avg_nodes": 206.5,
+      "valid_nodes": 0.0,
+      "last_used": "2026-02-04T22:58:15.584420",
+      "use_count": 12,
+      "frequency": "rarely",
       "created_at": "2026-02-04T20:47:54.688793",
-      "history": [],
-      "consecutive_failures": 0,
+      "history": [
+        {
+          "date": "2026-02-04T22:51:36.765211",
+          "total_nodes": 203,
+          "valid_nodes": 0,
+          "avg_latency": 9999
+        },
+        {
+          "date": "2026-02-04T22:59:08.534844",
+          "total_nodes": 210,
+          "valid_nodes": 0,
+          "avg_latency": 9999
+        }
+      ],
+      "consecutive_failures": 2,
       "best_score": 75,
-      "last_score_change": 0,
+      "last_score_change": -17,
       "recovery_count": 0
     },
     {
       "url": "https://raw.githubusercontent.com/asgharkapk/Sub-Config-Extractor/refs/heads/main/output_configs/clash/Surfboardv2ray/TGParse/splitted/vless.yaml",
       "name": "sub_020",
-      "score": 75,
-      "success_rate": 0,
+      "score": 50,
+      "success_rate": 0.0,
       "avg_latency": 999,
-      "avg_nodes": 0,
-      "valid_nodes": 0,
-      "last_used": "2026-02-04T20:48:48.693525",
-      "use_count": 2,
-      "frequency": "new",
+      "avg_nodes": 658.0,
+      "valid_nodes": 0.0,
+      "last_used": "2026-02-04T22:50:16.082356",
+      "use_count": 11,
+      "frequency": "sometimes",
       "created_at": "2026-02-04T20:47:54.688936",
-      "history": [],
-      "consecutive_failures": 0,
+      "history": [
+        {
+          "date": "2026-02-04T22:51:36.765277",
+          "total_nodes": 658,
+          "valid_nodes": 0,
+          "avg_latency": 9999
+        }
+      ],
+      "consecutive_failures": 1,
       "best_score": 75,
-      "last_score_change": 0,
+      "last_score_change": -25,
       "recovery_count": 0
     },
     {
       "url": "https://raw.githubusercontent.com/asgharkapk/Sub-Config-Extractor/refs/heads/main/output_configs/clash/MatinGhanbari/v2ray-configs/vless.txt.yaml",
       "name": "sub_021",
-      "score": 75,
-      "success_rate": 0,
+      "score": 33,
+      "success_rate": 0.0,
       "avg_latency": 999,
-      "avg_nodes": 0,
-      "valid_nodes": 0,
-      "last_used": "2026-02-04T20:48:48.693527",
-      "use_count": 2,
-      "frequency": "new",
+      "avg_nodes": 137.0,
+      "valid_nodes": 0.0,
+      "last_used": "2026-02-04T22:44:05.013740",
+      "use_count": 6,
+      "frequency": "rarely",
       "created_at": "2026-02-04T20:47:54.688945",
-      "history": [],
-      "consecutive_failures": 0,
+      "history": [
+        {
+          "date": "2026-02-04T22:25:22.943121",
+          "total_nodes": 137,
+          "valid_nodes": 0,
+          "avg_latency": 9999
+        },
+        {
+          "date": "2026-02-04T22:26:43.463329",
+          "total_nodes": 137,
+          "valid_nodes": 0,
+          "avg_latency": 9999
+        },
+        {
+          "date": "2026-02-04T22:29:28.576511",
+          "total_nodes": 137,
+          "valid_nodes": 0,
+          "avg_latency": 9999
+        },
+        {
+          "date": "2026-02-04T22:30:12.310484",
+          "total_nodes": 137,
+          "valid_nodes": 0,
+          "avg_latency": 9999
+        },
+        {
+          "date": "2026-02-04T22:34:53.254331",
+          "total_nodes": 137,
+          "valid_nodes": 0,
+          "avg_latency": 9999
+        },
+        {
+          "date": "2026-02-04T22:36:27.449123",
+          "total_nodes": 137,
+          "valid_nodes": 0,
+          "avg_latency": 9999
+        },
+        {
+          "date": "2026-02-04T22:39:39.470435",
+          "total_nodes": 137,
+          "valid_nodes": 0,
+          "avg_latency": 9999
+        },
+        {
+          "date": "2026-02-04T22:44:56.617136",
+          "total_nodes": 137,
+          "valid_nodes": 0,
+          "avg_latency": 9999
+        }
+      ],
+      "consecutive_failures": 8,
       "best_score": 75,
       "last_score_change": 0,
       "recovery_count": 0
@@ -414,8 +732,8 @@
       "avg_latency": 999,
       "avg_nodes": 0,
       "valid_nodes": 0,
-      "last_used": "2026-02-04T20:48:48.693529",
-      "use_count": 2,
+      "last_used": "2026-02-12T21:19:39.063780",
+      "use_count": 15,
       "frequency": "new",
       "created_at": "2026-02-04T20:47:54.688949",
       "history": [],
@@ -427,14 +745,14 @@
     {
       "url": "https://gh-proxy.com/raw.githubusercontent.com/ts-sf/fly/main/clash",
       "name": "sub_023",
-      "score": 75,
-      "success_rate": 0.02702702702702703,
-      "avg_latency": 1968.0,
-      "avg_nodes": 37.0,
+      "score": 24,
+      "success_rate": 0.023255813953488372,
+      "avg_latency": 2552.0,
+      "avg_nodes": 43.0,
       "valid_nodes": 1.0,
-      "last_used": "2026-02-04T20:48:48.693532",
-      "use_count": 2,
-      "frequency": "new",
+      "last_used": "2026-02-12T20:58:39.769829",
+      "use_count": 13,
+      "frequency": "recovery",
       "created_at": "2026-02-04T20:47:54.688958",
       "history": [
         {
@@ -442,14 +760,20 @@
           "total_nodes": 37,
           "valid_nodes": 1,
           "avg_latency": 1968.0
+        },
+        {
+          "date": "2026-02-12T20:59:33.657892",
+          "total_nodes": 49,
+          "valid_nodes": 1,
+          "avg_latency": 3136.0
         }
       ],
       "consecutive_failures": 0,
       "best_score": 75,
-      "last_score_change": 0,
+      "last_score_change": -51,
       "recovery_count": 0
     }
   ],
-  "last_update": "2026-02-04T20:49:59.981224",
+  "last_update": "2026-02-12T21:20:15.520406",
   "version": "2.0"
 }

@@ -17,6 +17,25 @@ uv sync
 ### Testing
 
 ```bash
+# Run all tests
+python3 -m unittest discover -s tests -v
+
+# Run a single test file
+python3 -m unittest tests.test_validator_naming -v
+
+# Run a single test class
+python3 -m unittest tests.test_validator_naming.TestValidatorNaming -v
+
+# Run a single test method
+python3 -m unittest tests.test_validator_naming.TestValidatorNaming.test_rename_final_nodes -v
+
+# Alternative: run test file directly
+python3 tests/test_validator_naming.py
+```
+
+### Application Entry Points
+
+```bash
 # Unified entry point - use run.py for all operations
 python3 run.py                          # 本地模式 (local)
 python3 run.py ci                       # CI/自动化模式
@@ -33,10 +52,6 @@ python3 scripts/subscription_manager.py report    # Generate report
 # Generate Clash config
 python3 scripts/clash_generator.py generate
 
-> Notes
-- The generator always writes output/clash_config.yml and output/clash_mini.yml.
-- If there are no valid nodes, placeholder configs are generated so CI copy steps won’t fail.
-- Shadowrocket URI lists are written to output/shadowrocket_nodes_full.txt and output/shadowrocket_nodes_mini.txt.
 # Rename nodes by geographic location
 python3 scripts/node_renamer.py [input_file] [output_file]
 ```
@@ -183,3 +198,6 @@ decoded = base64.b64decode(content + "=" * (4 - len(content) % 4))
 - Subscription URLs managed in `subscriptions.txt`
 - Node renaming: Nodes are automatically renamed by geographic location (flag + country/city)
 - IP geolocation cached in `data/ip_cache.json` for performance
+- The generator always writes output/clash_config.yml and output/clash_mini.yml
+- If there are no valid nodes, placeholder configs are generated so CI copy steps won't fail
+- Shadowrocket URI lists are written to output/shadowrocket_nodes_full.txt and output/shadowrocket_nodes_mini.txt
