@@ -247,7 +247,7 @@ class ClashManager:
             elif t == "vmess":
                 if not n.get("uuid"):
                     continue
-                uuid_val = n.get("uuid", "")
+                uuid_val = str(n.get("uuid", ""))
                 if "%" in uuid_val:
                     uuid_val = urllib.parse.unquote(uuid_val)
                 ws_headers = {}
@@ -278,7 +278,7 @@ class ClashManager:
             elif t == "trojan":
                 if not n.get("password"):
                     continue
-                password_val = n.get("password", "")
+                password_val = str(n.get("password", ""))
                 if "%" in password_val:
                     password_val = urllib.parse.unquote(password_val)
                 ws_headers = {}
@@ -307,7 +307,7 @@ class ClashManager:
                     continue
                 if not n.get("uuid"):
                     continue
-                uuid_val = n.get("uuid", "")
+                uuid_val = str(n.get("uuid", ""))
                 if "%" in uuid_val:
                     uuid_val = urllib.parse.unquote(uuid_val)
                 base = {
