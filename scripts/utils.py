@@ -16,10 +16,11 @@ def sanitize_name(name: str) -> str:
     Returns:
         清理后的安全名称
     """
-    # 移除非ASCII字符
+    if not name:
+        return "Node"
+
     sanitized = name.encode("ascii", "ignore").decode("ascii")
 
-    # 替换无效字符
     invalid_chars = [
         ":",
         "{",
@@ -43,8 +44,21 @@ def sanitize_name(name: str) -> str:
         " ",
         "'",
         '"',
+        "#",
+        "$",
+        "^",
+        "+",
+        "~",
+        "`",
     ]
     for char in invalid_chars:
         sanitized = sanitized.replace(char, "_")
 
-    return sanitized[:50] or "Node"
+    sanitized = sanitized.strip("_")
+
+    if not sanitized or not sanitized[0].isalpha():
+        sanitized = "Node_" + sanitized
+
+    sanitized = sanitized[:50] or "Node"
+
+    return sanitized
