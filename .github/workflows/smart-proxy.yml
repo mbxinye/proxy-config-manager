@@ -106,6 +106,7 @@ jobs:
         mkdir -p pages
         cp output/clash_config.yml pages/clash.yml
         cp output/clash_mini.yml pages/clash_mini.yml
+        cp output/clash_validator.yml pages/clash_validator.yml
         cp output/shadowrocket_nodes_full.txt pages/shadowrocket_full.txt
         cp output/shadowrocket_nodes_mini.txt pages/shadowrocket_mini.txt
         cp output/report.md pages/README.md
@@ -235,6 +236,7 @@ jobs:
         path: |
           output/clash_config.yml
           output/clash_mini.yml
+          output/clash_validator.yml
           output/shadowrocket_nodes_full.txt
           output/shadowrocket_nodes_mini.txt
           output/report.md
